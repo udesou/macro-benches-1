@@ -23,7 +23,7 @@ You can use it two ways:
 
 ## The benchmarks
 
-20 active tools, 31 programs. Most land in the 5-25s range that keeps a
+21 active tools, 32 programs. Most land in the 5-25s range that keeps a
 benchmark long enough to measure and short enough to iterate on; a few of the
 heavier compiler and proof workloads run longer, and goblint runs much shorter
 (its interest is allocation volume, not wall time).
@@ -52,6 +52,7 @@ what it runs, what it stresses in the runtime, and how to read its results.
 | [liq-video-frames](docs/benchmarks/liq-video-frames.md) | A refcounted pool of YUV420 video frames (reproduces [#14533](https://github.com/ocaml/ocaml/issues/14533)) | 4-20s |
 | [frama-c](docs/benchmarks/frama-c.md) | Frama-C EVA value analysis on zlib and the SQLite amalgamation (reproduces [#11733](https://github.com/ocaml/ocaml/issues/11733)) | 7-8s |
 | [goblint](docs/benchmarks/goblint.md) | Goblint SV-COMP analysis with apron (reproduces [#13733](https://github.com/ocaml/ocaml/issues/13733)) | 0.2-1s |
+| [infer](docs/benchmarks/infer.md) | Infer's multicore Java analysis (Pulse) over a fixed slice of a real bytecode corpus (guava, byte-buddy, lucene, bcprov) | ~15-25s |
 | [js_of_ocaml](docs/benchmarks/js_of_ocaml.md) | Compiles the runtime's own `ocamlc.byte` to JavaScript | 7-9s |
 
 Two more tools ship in the tree but are currently disabled:
