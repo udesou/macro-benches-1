@@ -1,0 +1,137 @@
+{
+  "schema_version": "1.0",
+  "run_id": "ermine-2026-08-20-Thu-053154",
+  "created_at": "2026-08-22T11:12:43Z",
+  "machine": {
+    "hostname": "ermine",
+    "cores": 80,
+    "kernel": "6.8.0-90-generic"
+  },
+  "tool_versions": { "perf": "6.8.12", "olly": "0.5.4-12-g3d37a0b" },
+  "configs": [
+    {
+      "config_id": "cfg_a5b8984970762965e027d08fcb7f14e7",
+      "runtime": { "kind": "OCaml", "version": "5.5.0" },
+      "tools": [ "olly", "perf" ],
+      "_runtime_name": "ocaml-5.5.0",
+      "_modifiers": [ "perf_grp1" ]
+    },
+    {
+      "config_id": "cfg_97c0e6479b462af7251259850c000caf",
+      "runtime": {
+        "kind": "OCaml",
+        "version": "5.5.0",
+        "options": [ "--enable-frame-pointers" ]
+      },
+      "tools": [ "olly", "perf" ],
+      "_runtime_name": "ocaml-5.5.0-fp",
+      "_modifiers": [ "perf_grp1" ]
+    },
+    {
+      "config_id": "cfg_9e2d5d29bc20a7fae8bad4b79753105d",
+      "runtime": {
+        "kind": "OCaml",
+        "version": "5.5.0",
+        "options": [ "--enable-flambda" ]
+      },
+      "tools": [ "olly", "perf" ],
+      "_runtime_name": "ocaml-5.5.0-flambda",
+      "_modifiers": [ "perf_grp1" ]
+    },
+    {
+      "config_id": "cfg_74ce8264cb697773c0d988073cd113be",
+      "runtime": {
+        "kind": "OCaml",
+        "version": "5.5.0",
+        "options": [ "--enable-frame-pointers", "--enable-flambda" ]
+      },
+      "tools": [ "olly", "perf" ],
+      "_runtime_name": "ocaml-5.5.0-fp-flambda",
+      "_modifiers": [ "perf_grp1" ]
+    }
+  ],
+  "comparisons": [
+    {
+      "kind": "inter",
+      "label": "5.5.0: fp+flambda vs stock",
+      "over": "runtime",
+      "mode": "pairwise",
+      "baseline": { "runtime.version": "5.5.0", "runtime.options": [] },
+      "variants": [
+        {
+          "runtime.version": "5.5.0",
+          "runtime.options": [ "--enable-frame-pointers" ]
+        },
+        {
+          "runtime.version": "5.5.0",
+          "runtime.options": [ "--enable-flambda" ]
+        },
+        {
+          "runtime.version": "5.5.0",
+          "runtime.options": [
+            "--enable-frame-pointers", "--enable-flambda"
+          ]
+        }
+      ]
+    }
+  ],
+  "benchmarks": [
+    { "name": "alt_ergo_chain_default", "suite": "macro-alt-ergo-monorepo" },
+    { "name": "alt_ergo_chain_large", "suite": "macro-alt-ergo-monorepo" },
+    { "name": "coqc_tree_default", "suite": "macro-coq-monorepo" },
+    { "name": "coqc_tree_large", "suite": "macro-coq-monorepo" },
+    { "name": "cpdf_squeeze_default", "suite": "macro-cpdf-monorepo" },
+    { "name": "cpdf_squeeze_large", "suite": "macro-cpdf-monorepo" },
+    { "name": "devkit_htmlstream_default", "suite": "macro-devkit" },
+    { "name": "devkit_htmlstream_large", "suite": "macro-devkit" },
+    { "name": "eio_conc_default", "suite": "macro-eio" },
+    { "name": "eio_conc_large", "suite": "macro-eio" },
+    {
+      "name": "frama_c_eva_sqlite_default",
+      "suite": "macro-frama-c-monorepo"
+    },
+    { "name": "frama_c_eva_sqlite_large", "suite": "macro-frama-c-monorepo" },
+    { "name": "irmin_mem_rw_default", "suite": "macro-irmin" },
+    { "name": "irmin_mem_rw_large", "suite": "macro-irmin" },
+    { "name": "jsoo_default", "suite": "macro-jsoo" },
+    { "name": "jsoo_large", "suite": "macro-jsoo" },
+    {
+      "name": "liq_parse_typecheck_default",
+      "suite": "macro-liquidsoap-lang"
+    },
+    { "name": "liq_parse_typecheck_large", "suite": "macro-liquidsoap-lang" },
+    {
+      "name": "liq_video_frames_pool_default",
+      "suite": "macro-liq-video-frames"
+    },
+    {
+      "name": "liq_video_frames_pool_large",
+      "suite": "macro-liq-video-frames"
+    },
+    { "name": "menhir_ocamly", "suite": "macro-menhir-monorepo" },
+    { "name": "menhir_sysver_canonical", "suite": "macro-menhir-monorepo" },
+    {
+      "name": "ocamlc_compile_uucp_default",
+      "suite": "macro-ocamlc-self-compile"
+    },
+    {
+      "name": "ocamlc_compile_uucp_large",
+      "suite": "macro-ocamlc-self-compile"
+    },
+    { "name": "ocamlformat_rocq_default", "suite": "macro-ocamlformat" },
+    { "name": "ocamlformat_rocq_large", "suite": "macro-ocamlformat" },
+    { "name": "owl_gc_default", "suite": "macro-owl" },
+    { "name": "owl_gc_large", "suite": "macro-owl" },
+    { "name": "pplacer_like_default", "suite": "macro-pplacer" },
+    { "name": "pplacer_like_large", "suite": "macro-pplacer" },
+    { "name": "sedlex_tokenize_default", "suite": "macro-sedlex" },
+    { "name": "sedlex_tokenize_large", "suite": "macro-sedlex" },
+    { "name": "test_decompress_default", "suite": "macro-decompress" },
+    { "name": "test_decompress_large", "suite": "macro-decompress" },
+    { "name": "ydump_repeat_default", "suite": "macro-yojson" },
+    { "name": "ydump_repeat_large", "suite": "macro-yojson" },
+    { "name": "zarith_pi_default", "suite": "macro-zarith" },
+    { "name": "zarith_pi_large", "suite": "macro-zarith" }
+  ],
+  "_produced_by": "running-ng (native) ; benchmarks list regenerated from merged measurements (N=5, 38 benches, goblint excluded)"
+}
