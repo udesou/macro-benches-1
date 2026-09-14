@@ -899,6 +899,63 @@ else
 fi
 echo ""
 
+# Patch 25: extunix gettid -- teach the probe FreeBSD's spelling.
+# devkit's log.ml and files.ml call `U.gettid ()` where `U = ExtUnix.Specific`
+# (prelude.ml). ExtUnix.Specific exposes only what the platform actually has,
+# so on FreeBSD the whole devkit build dies at compile time with
+#   Error: Unbound value U.gettid
+# and with it benchmarks/ahrefs-devkit, the only consumer.
+#
+# This is NOT a missing system library and NOT devkit's bug. extunix already
+# implements gettid four ways in src/unistd.c (Win32 GetCurrentThreadId, macOS
+# pthread_threadid_np, older macOS SYS_thread_selfid, Linux SYS_gettid); its
+# discover.ml probes them as an ordered ANY[...] and FreeBSD matches none,
+# purely on spelling. FreeBSD calls it pthread_getthreadid_np(), declared in
+# <pthread_np.h>, where macOS calls it pthread_threadid_np().
+#
+# So add a fifth alternative, shaped exactly like the macOS one. `I` and
+# `DEFINE` are both documented in discover.ml as "promoted to config", so the
+# include and the define land in the generated config.h that unistd.c already
+# includes. On Linux nothing changes: the probe is ordered, the pthread_np.h
+# alternative fails there, and the SYS_gettid branch still wins.
+EXTUNIX_DISCOVER="duniverse/extunix/discover/discover.ml"
+EXTUNIX_UNISTD="duniverse/extunix/src/unistd.c"
+if [ -f "$EXTUNIX_DISCOVER" ] && [ -f "$EXTUNIX_UNISTD" ]; then
+  if grep -q "EXTUNIX_USE_PTHREAD_GETTHREADID_NP" "$EXTUNIX_DISCOVER" 2>/dev/null; then
+    echo "  [25] extunix gettid: already patched."
+  else
+    python3 - "$EXTUNIX_DISCOVER" "$EXTUNIX_UNISTD" <<'PYEOF'
+import sys
+
+disc, unistd = sys.argv[1], sys.argv[2]
+
+s = open(disc).read()
+old = '      [ DEFINE "EXTUNIX_USE_THREAD_SELFID"; I "sys/syscall.h"; S "syscall"; V "SYS_thread_selfid"];\n'
+new = old + ('      [ DEFINE "EXTUNIX_USE_PTHREAD_GETTHREADID_NP"; I "pthread_np.h";'
+             ' S "pthread_getthreadid_np" ];\n')
+if old not in s:
+    sys.exit("  [25] extunix gettid: discover.ml GETTID probe not in the expected shape")
+open(disc, "w").write(s.replace(old, new, 1))
+
+c = open(unistd).read()
+old_c = """#elif defined(EXTUNIX_USE_THREAD_SELFID)
+  pid_t tid = 0;
+  tid = syscall(SYS_thread_selfid);
+"""
+new_c = old_c + """#elif defined(EXTUNIX_USE_PTHREAD_GETTHREADID_NP)
+  int tid = pthread_getthreadid_np();
+"""
+if old_c not in c:
+    sys.exit("  [25] extunix gettid: unistd.c gettid body not in the expected shape")
+open(unistd, "w").write(c.replace(old_c, new_c, 1))
+print("  [25] extunix gettid: added the FreeBSD pthread_getthreadid_np branch.")
+PYEOF
+  fi
+else
+  echo "  [25] extunix gettid: not vendored. Skipping."
+fi
+echo ""
+
 # [22] sedlex unicode.ml: stop regenerating it from a live download.
 #
 # duniverse/sedlex/src/syntax/dune has a `(mode promote)` rule that regenerates

@@ -76,33 +76,33 @@ On FreeBSD, as root:
 
 ```sh
 pkg install autoconf automake libtool m4 pkgconf gmake \
-            gmp mpfr openblas lapacke gsl sqlite3 libyaml perl5
+            gmp mpfr openblas lapacke gsl sqlite3 libyaml perl5 \
+            curl libev libevent pcre
 ```
 
-It is shorter than the apt list, and deliberately so:
+Two differences from the apt list, both deliberate:
 
-* **zlib is not there.** FreeBSD ships it in the base system, so there is no
-  package to install. The same goes for a C toolchain: base clang covers
-  `build-essential`. `gmake` is separate because a few vendored `configure`
-  scripts generate GNU-only makefiles.
-* **No libcurl, libev, libevent or pcre.** Every one of them is devkit's, and
-  devkit cannot build on FreeBSD at all (see below), so on FreeBSD they buy
-  nothing. Checking the `conf-*` depexts across the vendored tree:
-  `conf-libevent` and `conf-libpcre2-8` are named only by
-  `macro-bench-devkit`; `conf-libpcre` and `conf-libcurl` add only
-  `pcre-ocaml` and `ocurl`, which nothing but `duniverse/devkit` depends on;
-  and `conf-libev` is a *depopt* of lwt (`--use-libev
-  %{conf-libev:installed}%`), so lwt builds without it.
-* **`perl5` and the autotools** are goblint's apron build (setup patch 15
-  needs `aclocal`/`autoreconf`), pplacer's mcl build, and `cpu`'s
-  `conf-autoconf`.
+* **No zlib, and no C toolchain.** FreeBSD ships both in the base system, so
+  there is nothing to install. `gmake` is listed separately because a few
+  vendored `configure` scripts generate GNU-only makefiles.
+* **No PCRE2.** Neither list needs it. `conf-libpcre2-8` used to sit in
+  `macro-bench-devkit.opam.template`, but nothing in the tree has ever used
+  PCRE2: devkit depends on the `pcre` OCaml library (PCRE **1**, via
+  `conf-libpcre`), there is no `Pcre2.` anywhere under `duniverse/`, and the
+  apt list only ever installed `libpcre3-dev`. On CI the requirement was
+  satisfied by accident, because `libgio-2.0-dev` and `libselinux1-dev` drag
+  `libpcre2-dev` in. It has been dropped from the template and the lock.
 
-**devkit cannot be enabled by installing packages.** It calls `U.gettid`, which
-is Linux-only with no FreeBSD equivalent, so `duniverse/devkit` fails to compile
-(`Unbound value U.gettid` in `log.ml` and `files.ml`). That is an upstream code
-change, not a dependency. Only `benchmarks/ahrefs-devkit` needs it, which is
-why five of the apt list's entries have no FreeBSD counterpart above. On Linux
-devkit does build, so the apt list keeps them.
+**devkit needs a source patch on FreeBSD, which `make setup` applies for you**
+(patch 25). It calls `U.gettid ()`, where `U = ExtUnix.Specific`, and
+`ExtUnix.Specific` exposes only what the platform actually has. extunix already
+implements `gettid` four ways, but its `discover.ml` probe matches none of them
+on FreeBSD purely on spelling: FreeBSD calls it `pthread_getthreadid_np()` in
+`<pthread_np.h>` where macOS calls it `pthread_threadid_np()`. Without the
+patch `duniverse/devkit` fails to compile with `Unbound value U.gettid`, taking
+`benchmarks/ahrefs-devkit` with it. Patch 25 adds the missing probe
+alternative; Linux is unaffected, since `pthread_np.h` does not exist there and
+the probe still falls through to `SYS_gettid`.
 
 This is the same list CI installs, so it is the one that is actually exercised on
 a clean machine. Notably `liblapacke-dev` is separate from `libopenblas-dev` —
