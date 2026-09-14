@@ -72,6 +72,38 @@ sudo apt install build-essential autoconf automake m4 pkg-config \
                  libgsl-dev libsqlite3-dev libyaml-dev
 ```
 
+On FreeBSD, as root:
+
+```sh
+pkg install autoconf automake libtool m4 pkgconf gmake \
+            gmp mpfr openblas lapacke gsl sqlite3 libyaml perl5
+```
+
+It is shorter than the apt list, and deliberately so:
+
+* **zlib is not there.** FreeBSD ships it in the base system, so there is no
+  package to install. The same goes for a C toolchain: base clang covers
+  `build-essential`. `gmake` is separate because a few vendored `configure`
+  scripts generate GNU-only makefiles.
+* **No libcurl, libev, libevent or pcre.** Every one of them is devkit's, and
+  devkit cannot build on FreeBSD at all (see below), so on FreeBSD they buy
+  nothing. Checking the `conf-*` depexts across the vendored tree:
+  `conf-libevent` and `conf-libpcre2-8` are named only by
+  `macro-bench-devkit`; `conf-libpcre` and `conf-libcurl` add only
+  `pcre-ocaml` and `ocurl`, which nothing but `duniverse/devkit` depends on;
+  and `conf-libev` is a *depopt* of lwt (`--use-libev
+  %{conf-libev:installed}%`), so lwt builds without it.
+* **`perl5` and the autotools** are goblint's apron build (setup patch 15
+  needs `aclocal`/`autoreconf`), pplacer's mcl build, and `cpu`'s
+  `conf-autoconf`.
+
+**devkit cannot be enabled by installing packages.** It calls `U.gettid`, which
+is Linux-only with no FreeBSD equivalent, so `duniverse/devkit` fails to compile
+(`Unbound value U.gettid` in `log.ml` and `files.ml`). That is an upstream code
+change, not a dependency. Only `benchmarks/ahrefs-devkit` needs it, which is
+why five of the apt list's entries have no FreeBSD counterpart above. On Linux
+devkit does build, so the apt list keeps them.
+
 This is the same list CI installs, so it is the one that is actually exercised on
 a clean machine. Notably `liblapacke-dev` is separate from `libopenblas-dev` —
 owl links `-llapacke`, and without it the build fails at link time with
