@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+# lib-portable.sh — shell helpers that behave the same on GNU and BSD userland.
+#
+# Sourced by setup-monorepo.sh and the vendor-*.sh scripts. Every helper here
+# exists because the obvious GNU spelling silently differs or outright fails on
+# FreeBSD and macOS:
+#
+#   sed -i          BSD sed requires an argument to -i; GNU forbids one.
+#   sed '0,/re/'    GNU-only line-0 range, used to mean "first match only".
+#   sed '/re/a txt' GNU one-line append; BSD wants `a\` and a newline.
+#   md5sum          GNU coreutils; BSD has md5 with different output.
+#   nproc           GNU coreutils; BSD has sysctl hw.ncpu.
+#
+# These are NOT FreeBSD-specific replacements: each works on Linux too, and
+# the Linux behaviour must not change. `sed_i` in particular avoids -i
+# altogether rather than switching on the platform, so there is one code path.
+#
+# REGEX DIALECT: every helper below that takes a <regex> passes it to awk,
+# which understands only EREs. So a literal parenthesis is `[(]`, not `\(`:
+# the sed spelling `\(` reaches awk as a capture group, which happens to match
+# the same text in some cases and silently not in others. Bracket forms are
+# unambiguous in both dialects, so call sites use those.
+
+# sed_i <sed args...> <file>
+#
+# In-place sed without -i. Writes to a temp file and copies back, which
+# preserves the original file's mode and inode (a plain `mv` would not).
+sed_i() {
+    local file="${!#}"                       # last argument
+    local args=("${@:1:$#-1}")               # everything before it
+    local tmp
+    tmp="$(mktemp "${TMPDIR:-/tmp}/sed_i.XXXXXX")" || return 1
+    if sed "${args[@]}" "$file" > "$tmp"; then
+        cat "$tmp" > "$file"
+        rm -f "$tmp"
+    else
+        rm -f "$tmp"
+        return 1
+    fi
+}
+
+# insert_after <file> <regex> <text...>
+#
+# Append the given lines after every line matching <regex>. Replaces GNU
+# `sed -i '/re/a text'`. Each argument after the regex becomes one line, so
+# text containing backslashes or leading whitespace needs no escaping, which
+# is the part that makes the sed spelling so awkward.
+insert_after() {
+    local file="$1" regex="$2"
+    shift 2
+    local tmp
+    tmp="$(mktemp "${TMPDIR:-/tmp}/insert_after.XXXXXX")" || return 1
+    awk -v re="$regex" -v n="$#" 'BEGIN { for (i = 1; i < ARGC - 1; i++) { add[i] = ARGV[i]; ARGV[i] = "" } }
+        { print }
+        $0 ~ re { for (i = 1; i <= n; i++) print add[i] }
+    ' "$@" "$file" > "$tmp" && cat "$tmp" > "$file"
+    local rc=$?
+    rm -f "$tmp"
+    return $rc
+}
+
+# insert_after_offset <file> <regex> <offset> <text...>
+#
+# Append after the line <offset> lines below a match, so offset 0 is the
+# matching line itself. Replaces GNU `sed '/re/{N;N;N; a text}'`, where the
+# Ns advance past a block before appending.
+insert_after_offset() {
+    local file="$1" regex="$2" offset="$3"
+    shift 3
+    local tmp
+    tmp="$(mktemp "${TMPDIR:-/tmp}/insert_off.XXXXXX")" || return 1
+    awk -v re="$regex" -v off="$offset" -v n="$#" 'BEGIN { for (i = 1; i < ARGC - 1; i++) { add[i] = ARGV[i]; ARGV[i] = "" } }
+        { print
+          if (!target && $0 ~ re) target = FNR + off
+          if (target && FNR >= target) { for (i = 1; i <= n; i++) print add[i]; target = 0 }
+        }
+    ' "$@" "$file" > "$tmp" && cat "$tmp" > "$file"
+    local rc=$?
+    rm -f "$tmp"
+    return $rc
+}
+
+# insert_at_line <file> <lineno> <text...>
+#
+# Append after a given line number. Replaces GNU `sed -i '1a text'`.
+insert_at_line() {
+    local file="$1" lineno="$2"
+    shift 2
+    local tmp
+    tmp="$(mktemp "${TMPDIR:-/tmp}/insert_at.XXXXXX")" || return 1
+    awk -v ln="$lineno" -v n="$#" 'BEGIN { for (i = 1; i < ARGC - 1; i++) { add[i] = ARGV[i]; ARGV[i] = "" } }
+        { print; if (FNR == ln) for (i = 1; i <= n; i++) print add[i] }
+    ' "$@" "$file" > "$tmp" && cat "$tmp" > "$file"
+    local rc=$?
+    rm -f "$tmp"
+    return $rc
+}
+
+# delete_first_match <file> <regex>
+#
+# Delete only the FIRST line matching <regex>. Replaces GNU
+# `sed -i '0,/re/{/re/d}'`, whose line-0 range BSD sed rejects.
+delete_first_match() {
+    local file="$1" regex="$2"
+    local tmp
+    tmp="$(mktemp "${TMPDIR:-/tmp}/del_first.XXXXXX")" || return 1
+    awk -v re="$regex" '!done && $0 ~ re { done = 1; next } { print }' \
+        "$file" > "$tmp" && cat "$tmp" > "$file"
+    local rc=$?
+    rm -f "$tmp"
+    return $rc
+}
+
+# checksum <file>
+#
+# Lowercase hex MD5, however the platform spells the tool. GNU coreutils has
+# md5sum; FreeBSD and macOS have md5, whose default output is
+# "MD5 (file) = hash", hence -q.
+checksum() {
+    if command -v md5sum >/dev/null 2>&1; then
+        md5sum "$1" | cut -d' ' -f1
+    elif command -v md5 >/dev/null 2>&1; then
+        md5 -q "$1"
+    else
+        echo "ERROR: neither md5sum nor md5 found; cannot verify downloads" >&2
+        return 1
+    fi
+}
+
+# ncpu — usable parallelism, defaulting to 1 rather than guessing high.
+ncpu() {
+    if command -v nproc >/dev/null 2>&1; then
+        nproc
+    elif command -v sysctl >/dev/null 2>&1 && sysctl -n hw.ncpu >/dev/null 2>&1; then
+        sysctl -n hw.ncpu
+    else
+        echo 1
+    fi
+}

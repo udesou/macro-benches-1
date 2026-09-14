@@ -41,7 +41,9 @@ if ! printf '#include <mpfr.h>\n' | "${CC:-cc}" -E - >/dev/null 2>&1; then
     _mpfr_t="$(mktemp -d)"
     curl -fsSL "$(src_field mpfr url)" -o "$_mpfr_t/mpfr.tar.xz"
     tar xf "$_mpfr_t/mpfr.tar.xz" -C "$_mpfr_t"
-    _ncpu="$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)"
+    # One spelling for this, in lib-portable.sh, so there is a single
+    # place to fix if a platform needs a third fallback.
+    _ncpu="$(ncpu)"
     ( cd "$_mpfr_t/mpfr-$(src_field mpfr version)"
       ./configure --prefix="$MPFR_PREFIX" --disable-static --enable-shared >/dev/null 2>&1
       make -j"$_ncpu" >/dev/null 2>&1 && make install >/dev/null 2>&1 )
