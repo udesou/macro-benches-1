@@ -15,6 +15,39 @@
 # the Linux behaviour must not change. `sed_i` in particular avoids -i
 # altogether rather than switching on the platform, so there is one code path.
 #
+# PKG PREFIX: on FreeBSD, pkg installs headers under /usr/local/include and
+# libraries under /usr/local/lib, and the base clang searches NEITHER. Its
+# default list is only /usr/lib/clang/<v>/include and /usr/include, so a
+# vendored C stub that includes a pkg-installed header fails with
+#   fatal error: 'gsl/gsl_vector.h' file not found
+# even though the package is installed. On Linux everything lands in
+# /usr/include, so this cannot show up there, which is why it took a cold
+# FreeBSD run to surface: it hit gsl and libevent, but it is a CLASS, not two
+# libraries, and any pkg-installed header would trip it.
+#
+# Exported here rather than in setup-monorepo.sh so the vendor-*.sh scripts get
+# it when run directly too; they all source this file. Appended, not prepended:
+# a caller who set these deliberately keeps priority over us. Idempotent,
+# because setup-monorepo.sh exports these and then each vendor script is a
+# subprocess that inherits them AND sources this file again, which would
+# otherwise grow a duplicate entry per nesting level. FreeBSD only: NetBSD and
+# OpenBSD use a different prefix and neither has been tested.
+if [ "$(uname -s)" = "FreeBSD" ]; then
+    _localbase="${LOCALBASE:-$(sysctl -n user.localbase 2>/dev/null || echo /usr/local)}"
+    _append_path_once() {      # <var name> <dir>
+        local _cur="${!1:-}"
+        case ":${_cur}:" in
+            *":$2:"*) return 0 ;;
+        esac
+        export "$1=${_cur:+${_cur}:}$2"
+    }
+    _append_path_once C_INCLUDE_PATH     "${_localbase}/include"
+    _append_path_once CPLUS_INCLUDE_PATH "${_localbase}/include"
+    _append_path_once LIBRARY_PATH       "${_localbase}/lib"
+    unset _localbase
+    unset -f _append_path_once
+fi
+
 # REGEX DIALECT: every helper below that takes a <regex> passes it to awk,
 # which understands only EREs. So a literal parenthesis is `[(]`, not `\(`:
 # the sed spelling `\(` reaches awk as a capture group, which happens to match

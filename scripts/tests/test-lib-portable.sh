@@ -160,6 +160,53 @@ case "$sum" in
     *) bad "checksum gave '$sum'" ;;
 esac
 
+# --- the FreeBSD pkg prefix exports ------------------------------------------
+# Sourcing this file on FreeBSD must put LOCALBASE's include/lib on the C
+# toolchain's search path (base clang searches neither), must not touch a
+# Linux host, must leave a caller's own value in front, and must not grow a
+# duplicate entry when a vendor script re-sources it in a subprocess.
+#
+# Driven through a fake `uname` so the FreeBSD branch is exercised HERE, on
+# Linux, rather than only on the platform it exists for. That is the same
+# blind spot the insert_* helpers had.
+FAKE="$WORK/fakebin"
+mkdir -p "$FAKE"
+printf '#!/bin/sh\n[ "$1" = "-s" ] && echo FreeBSD || exit 1\n' > "$FAKE/uname"
+printf '#!/bin/sh\nexit 1\n' > "$FAKE/sysctl"   # no user.localbase: force the fallback
+chmod +x "$FAKE/uname" "$FAKE/sysctl"
+
+_as_freebsd() {   # <preset C_INCLUDE_PATH or empty> <times to source>
+    PATH="$FAKE:$PATH" C_INCLUDE_PATH="$1" LOCALBASE="" \
+    "$ROOT_DIR/scripts/tests/.reader.sh" "$2"
+}
+cat > "$ROOT_DIR/scripts/tests/.reader.sh" <<'READER'
+#!/usr/bin/env bash
+[ -n "${C_INCLUDE_PATH:-}" ] || unset C_INCLUDE_PATH
+[ -n "${LOCALBASE:-}" ] || unset LOCALBASE
+i=0; while [ "$i" -lt "$1" ]; do . "$(dirname "$0")/../lib-portable.sh"; i=$((i + 1)); done
+printf '%s\n' "${C_INCLUDE_PATH:-}"
+READER
+chmod +x "$ROOT_DIR/scripts/tests/.reader.sh"
+
+[ "$(_as_freebsd "" 1)" = "/usr/local/include" ] \
+    && ok "FreeBSD: LOCALBASE/include is added" \
+    || bad "FreeBSD: got '$(_as_freebsd "" 1)'"
+[ "$(_as_freebsd "/opt/mine/include" 1)" = "/opt/mine/include:/usr/local/include" ] \
+    && ok "FreeBSD: a caller's own value keeps priority" \
+    || bad "FreeBSD: caller value not preserved: '$(_as_freebsd "/opt/mine/include" 1)'"
+[ "$(_as_freebsd "" 3)" = "/usr/local/include" ] \
+    && ok "FreeBSD: re-sourcing does not duplicate the entry" \
+    || bad "FreeBSD: duplicated on re-source: '$(_as_freebsd "" 3)'"
+rm -f "$ROOT_DIR/scripts/tests/.reader.sh"
+
+# On this host (not FreeBSD) sourcing must add nothing at all.
+if [ "$(uname -s)" != "FreeBSD" ]; then
+    ( unset C_INCLUDE_PATH; . "$ROOT_DIR/scripts/lib-portable.sh"
+      [ -z "${C_INCLUDE_PATH:-}" ] ) \
+        && ok "non-FreeBSD host: C_INCLUDE_PATH left alone" \
+        || bad "non-FreeBSD host: C_INCLUDE_PATH was modified"
+fi
+
 n="$(ncpu)"
 case "$n" in
     ''|*[!0-9]*) bad "ncpu gave '$n', not a number" ;;
