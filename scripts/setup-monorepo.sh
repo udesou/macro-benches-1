@@ -257,7 +257,7 @@ echo ""
 echo "[3/9] Patching duniverse/dune_/dune-project (lang dune 3.2x → 3.21)..."
 if grep -qE 'lang dune 3\.2[0-9]' duniverse/dune_/dune-project 2>/dev/null && \
    ! grep -q 'lang dune 3.21' duniverse/dune_/dune-project 2>/dev/null; then
-  sed -i -E 's/lang dune 3\.2[0-9]+/lang dune 3.21/' duniverse/dune_/dune-project
+  sed_i -E 's/lang dune 3\.2[0-9]+/lang dune 3.21/' duniverse/dune_/dune-project
   rm -rf duniverse/dune_/test
   echo "  Patched ($(head -1 duniverse/dune_/dune-project))."
 else
@@ -284,7 +284,7 @@ echo "[3b/9] Patching duniverse/rocq for dune >= 3.24 (dropping dead coq extensi
 _rocq_patched=0
 if grep -qE '^\(using coq [0-9.]+\)' duniverse/rocq/dune-project 2>/dev/null; then
   # Also drop the comment that exists only to explain the declaration.
-  sed -i -E '/^; We need this for when we use the dune\.disabled files instead of our rule_gen$/d; /^\(using coq [0-9.]+\)$/d' \
+  sed_i -E '/^; We need this for when we use the dune\.disabled files instead of our rule_gen$/d; /^\(using coq [0-9.]+\)$/d' \
     duniverse/rocq/dune-project
   _rocq_patched=1
 fi
@@ -384,7 +384,7 @@ else
   _proc_tgz="$(mktemp -d)/processor.tgz"
   curl -fsSL "${_proc_url}" -o "${_proc_tgz}"
   _proc_want="$(src_field processor md5)"
-  _proc_got="$(md5sum "${_proc_tgz}" | cut -d' ' -f1)"
+  _proc_got="$(checksum "${_proc_tgz}")"
   if [ -n "${_proc_want}" ] && [ "${_proc_want}" != "${_proc_got}" ]; then
     echo "ERROR: processor tarball md5 ${_proc_got}, expected ${_proc_want}" >&2
     exit 1
@@ -453,7 +453,7 @@ echo "[7/9] Applying vendored source patches..."
 # Patch 1: alt-ergo ppx_blob paths (workspace-root-relative)
 THEORIES_ML="duniverse/alt-ergo/src/lib/util/theories.ml"
 if grep -q '\[%blob "src/preludes/' "$THEORIES_ML" 2>/dev/null; then
-  sed -i 's|\[%blob "src/preludes/|\[%blob "duniverse/alt-ergo/src/preludes/|g' "$THEORIES_ML"
+  sed_i 's|\[%blob "src/preludes/|\[%blob "duniverse/alt-ergo/src/preludes/|g' "$THEORIES_ML"
   echo "  [1] alt-ergo ppx_blob paths: patched."
 else
   echo "  [1] alt-ergo ppx_blob paths: already patched."
@@ -501,8 +501,10 @@ if grep -q 'method virtual id' duniverse/lwt/src/unix/lwt_engine.mli 2>/dev/null
   if grep -q 'Engine_id__libevent' "$DEVKIT_LWT" 2>/dev/null; then
     echo "  [6] devkit lwt 6.x compat: already patched."
   else
-    sed -i '/libevent-based engine for lwt/a type Lwt_engine.engine_id += Engine_id__libevent' "$DEVKIT_LWT"
-    sed -i '/inherit Lwt_engine.abstract/a\  method id = Engine_id__libevent' "$DEVKIT_LWT"
+    insert_after "$DEVKIT_LWT" 'libevent-based engine for lwt' \
+      'type Lwt_engine.engine_id += Engine_id__libevent'
+    insert_after "$DEVKIT_LWT" 'inherit Lwt_engine.abstract' \
+      '  method id = Engine_id__libevent'
     echo "  [6] devkit lwt 6.x compat: patched."
   fi
 else
@@ -514,9 +516,9 @@ LIBEVENT_ML="vendor/libevent/libevent.ml"
 if grep -q '~persist' "$LIBEVENT_ML" 2>/dev/null; then
   echo "  [7] libevent labels: already patched."
 else
-  sed -i 's/^let set base event fd etype persist/let set base event fd etype ~persist/' "$LIBEVENT_ML"
-  sed -i 's/^let set_timer base event persist/let set_timer base event ~persist/' "$LIBEVENT_ML"
-  sed -i 's/^let set_signal base event signal persist/let set_signal base event ~signal ~persist/' "$LIBEVENT_ML"
+  sed_i 's/^let set base event fd etype persist/let set base event fd etype ~persist/' "$LIBEVENT_ML"
+  sed_i 's/^let set_timer base event persist/let set_timer base event ~persist/' "$LIBEVENT_ML"
+  sed_i 's/^let set_signal base event signal persist/let set_signal base event ~signal ~persist/' "$LIBEVENT_ML"
   echo "  [7] libevent labels: patched."
 fi
 
@@ -529,8 +531,8 @@ if [ -f "$JSOO_DUNE" ] && grep -q '(public_name js_of_ocaml)' "$JSOO_DUNE" 2>/de
   # (install ...) stanzas alone. Do NOT anchor to a line number: upstream
   # reorders these fields (public_name moved from line 2 to line 3), which
   # silently turned this patch into a no-op that still reported success.
-  sed -i '0,/^ (public_name js_of_ocaml)$/{/^ (public_name js_of_ocaml)$/d}' "$JSOO_DUNE"
-  sed -i '0,/^ (package js_of_ocaml-compiler)$/{/^ (package js_of_ocaml-compiler)$/d}' "$JSOO_DUNE"
+  delete_first_match "$JSOO_DUNE" '^ [(]public_name js_of_ocaml[)]$'
+  delete_first_match "$JSOO_DUNE" '^ [(]package js_of_ocaml-compiler[)]$'
   echo "  [8] jsoo public_name: removed from executable stanza."
 elif [ -f "$JSOO_DUNE" ]; then
   echo "  [8] jsoo public_name: already removed."
@@ -543,8 +545,8 @@ OCFMT_DUNE="duniverse/ocamlformat/bin/ocamlformat/dune"
 if [ -f "$OCFMT_DUNE" ] && grep -q '(public_name ocamlformat)' "$OCFMT_DUNE" 2>/dev/null; then
   # Remove only the first occurrence of public_name and the package line
   # immediately after it (lines 14-15 in the executable stanza).
-  sed -i '0,/(public_name ocamlformat)/{/(public_name ocamlformat)/d}' "$OCFMT_DUNE"
-  sed -i '0,/^ (package ocamlformat)$/{/^ (package ocamlformat)$/d}' "$OCFMT_DUNE"
+  delete_first_match "$OCFMT_DUNE" '[(]public_name ocamlformat[)]'
+  delete_first_match "$OCFMT_DUNE" '^ [(]package ocamlformat[)]$'
   echo "  [9] ocamlformat public_name: removed."
 elif [ -f "$OCFMT_DUNE" ]; then
   echo "  [9] ocamlformat public_name: already removed."
@@ -555,8 +557,8 @@ fi
 # Patch 10: owl C bug — std_gaussian_rvs called with arguments but takes none
 OWL_EXPONPOW="duniverse/owl/src/owl/stats/owl_stats_dist_exponpow.c"
 if [ -f "$OWL_EXPONPOW" ] && grep -q 'std_gaussian_rvs (a' "$OWL_EXPONPOW" 2>/dev/null; then
-  sed -i 's/std_gaussian_rvs (a \/ sqrt (2.0))/gaussian_rvs (0, a \/ sqrt (2.0))/' "$OWL_EXPONPOW"
-  sed -i 's/std_gaussian_rvs (B)/gaussian_rvs (0, B)/' "$OWL_EXPONPOW"
+  sed_i 's/std_gaussian_rvs (a \/ sqrt (2.0))/gaussian_rvs (0, a \/ sqrt (2.0))/' "$OWL_EXPONPOW"
+  sed_i 's/std_gaussian_rvs (B)/gaussian_rvs (0, B)/' "$OWL_EXPONPOW"
   echo "  [10] owl std_gaussian_rvs: patched (upstream C bug)."
 elif [ -f "$OWL_EXPONPOW" ]; then
   echo "  [10] owl std_gaussian_rvs: already patched."
@@ -571,13 +573,13 @@ fi
 BATGC_MLI="duniverse/batteries-included/src/batGc.mli"
 if [ -f "$BATGC_MLI" ]; then
   if grep -q '##V>=5\.6## live_stacks_words' "$BATGC_MLI"; then
-    sed -i -E '/live_stacks_words|Total space allocated outside of the OCaml heap|@since 5\.[56]\.0 \*\)/ s/##V>=5\.6##/##V>=5.5##/' "$BATGC_MLI"
+    sed_i -E '/live_stacks_words|Total space allocated outside of the OCaml heap|@since 5\.[56]\.0 \*\)/ s/##V>=5\.6##/##V>=5.5##/' "$BATGC_MLI"
     echo "  [11] batteries Gc.stat: relaxed live_stacks_words gate to ##V>=5.5##."
   elif ! grep -q 'live_stacks_words' "$BATGC_MLI"; then
-    sed -i '/##V>=4.12## forced_major_collections: int;/{
-      N;N;N
-      a##V>=5.5## live_stacks_words: int;\n##V>=5.5## (** Total space allocated outside of the OCaml heap for stack fragments.\n##V>=5.5##     @since 5.5.0 *)
-    }' "$BATGC_MLI"
+    insert_after_offset "$BATGC_MLI" '##V>=4.12## forced_major_collections: int;' 3 \
+      '##V>=5.5## live_stacks_words: int;' \
+      '##V>=5.5## (** Total space allocated outside of the OCaml heap for stack fragments.' \
+      '##V>=5.5##     @since 5.5.0 *)'
     echo "  [11] batteries Gc.stat: added live_stacks_words (##V>=5.5##)."
   else
     echo "  [11] batteries Gc.stat: already patched."
@@ -589,7 +591,7 @@ fi
 # Patch 12: mcl caml_mcl.c — add #include <stdint.h> for OCaml 5.6 trunk headers
 MCL_CAML="vendor/pplacer/mcl/caml/caml_mcl.c"
 if [ -f "$MCL_CAML" ] && ! grep -q 'stdint.h' "$MCL_CAML" 2>/dev/null; then
-  sed -i '1a #include <stdint.h>' "$MCL_CAML"
+  sed_i '1a #include <stdint.h>' "$MCL_CAML"
   echo "  [12] mcl caml_mcl.c: added #include <stdint.h>."
 elif [ -f "$MCL_CAML" ]; then
   echo "  [12] mcl caml_mcl.c: already patched."
@@ -655,7 +657,7 @@ fi
 # upstream comment deliberately avoids).
 GOBLINT_H="duniverse/analyzer/lib/goblint/runtime/include/goblint.h"
 if [ -f "$GOBLINT_H" ] && grep -q '__goblint_assume_join(/\* pthread_t' "$GOBLINT_H" 2>/dev/null; then
-  sed -i 's|void __goblint_assume_join(/\* pthread_t thread \*/);.*|void __goblint_assume_join(unsigned long thread); // pthread_t is unsigned long on Linux; avoids pthread.h vs kernel headers|' "$GOBLINT_H"
+  sed_i 's|void __goblint_assume_join(/\* pthread_t thread \*/);.*|void __goblint_assume_join(unsigned long thread); // pthread_t is unsigned long on Linux; avoids pthread.h vs kernel headers|' "$GOBLINT_H"
   echo "  [14] goblint.h: patched __goblint_assume_join signature (GCC 14+/C23)."
 elif [ -f "$GOBLINT_H" ]; then
   echo "  [14] goblint.h: already patched."
@@ -801,7 +803,7 @@ GOBLINT_CTRL="duniverse/analyzer/src/framework/control.ml"
 # after the sed there is no unannotated call left to match.
 if [ -f "$GOBLINT_CTRL" ] && grep -qF "analyze_loop (module CFG) file fs change_info" "$GOBLINT_CTRL" 2>/dev/null; then
   _n=$(grep -cF "analyze_loop (module CFG) file fs change_info" "$GOBLINT_CTRL")
-  sed -i 's/analyze_loop (module CFG) file fs change_info/analyze_loop (module CFG : CfgBidirSkip) file fs change_info/g' "$GOBLINT_CTRL"
+  sed_i 's/analyze_loop (module CFG) file fs change_info/analyze_loop (module CFG : CfgBidirSkip) file fs change_info/g' "$GOBLINT_CTRL"
   echo "  [18] goblint control.ml: annotated ${_n} (module CFG : CfgBidirSkip) call site(s) (OCaml >= 5.5)."
   unset _n
 elif [ -f "$GOBLINT_CTRL" ]; then
@@ -955,7 +957,7 @@ echo ""
 # call goes; camlpdf's other Pdfe diagnostics still print.
 PDFTREE_ML="vendor/camlpdf/pdftree.ml"
 if grep -q 'Pdfe.log "Warning Duplicate name/number tree key' "$PDFTREE_ML" 2>/dev/null; then
-  sed -i '/Pdfe.log "Warning Duplicate name\/number tree key/d' "$PDFTREE_ML"
+  sed_i '/Pdfe.log "Warning Duplicate name\/number tree key/d' "$PDFTREE_ML"
   echo "  [23] camlpdf duplicate-key warning: removed."
 else
   echo "  [23] camlpdf duplicate-key warning: already patched (or file missing)."
