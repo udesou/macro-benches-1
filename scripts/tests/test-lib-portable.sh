@@ -3,10 +3,17 @@
 # command it replaces. Run on Linux, where both are available, so the portable
 # spelling is checked against the original rather than merely "looking right".
 #
-#   sh scripts/tests/test-lib-portable.sh
+#   bash scripts/tests/test-lib-portable.sh
 #
-# On a BSD host the GNU comparisons are skipped and only the helpers run, which
-# still catches a helper that fails outright there.
+# bash, not sh: lib-portable.sh uses bash arrays (`"${@:1:$#-1}"`) and so does
+# every script that sources it. On FreeBSD bash lives in /usr/local/bin, which
+# the `#!/usr/bin/env bash` shebang finds.
+#
+# On a BSD host the GNU comparisons are skipped, so every helper ALSO carries an
+# unconditional assertion against an expected file. A helper whose only check is
+# a GNU comparison is functionally unverified on the platform it exists for,
+# which is the blind spot that let a GNU-only `sed '1a text'` script body survive
+# in setup-monorepo.sh's patch 12.
 set -u
 ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 . "$ROOT_DIR/scripts/lib-portable.sh"
@@ -61,16 +68,33 @@ fi
     || bad "delete_first_match deleted too many"
 
 # --- insert_at_line ----------------------------------------------------------
+# This is the helper setup-monorepo.sh's patch 12 uses on caml_mcl.c, so the
+# first case is that call site exactly.
 printf '#include <stdio.h>\nint main(){}\n' > in
 cp in p; insert_at_line p 1 '#include <stdint.h>'
+printf '#include <stdio.h>\n#include <stdint.h>\nint main(){}\n' > e
+same "insert_at_line 1 inserts after the first line" e p
 if gnu; then
     cp in g; sed -i '1a #include <stdint.h>' g
     same "insert_at_line vs sed '1a text'" g p
 fi
 
+# several lines at once, and at a line that is not the first
+printf 'l1\nl2\nl3\n' > in
+cp in p; insert_at_line p 2 'A' 'B'
+printf 'l1\nl2\nA\nB\nl3\n' > e
+same "insert_at_line inserts several lines in order, mid-file" e p
+
+# a line number past the end must leave the file alone rather than append
+printf 'l1\nl2\n' > in
+cp in p; insert_at_line p 99 'X'
+same "insert_at_line past the end changes nothing" in p
+
 # --- insert_after_offset: the N;N;N case, and offset 0 ----------------------
 printf 'p0\nMATCH\nn1\nn2\nn3\ntail\n' > in
 cp in p; insert_after_offset p 'MATCH' 3 'A1' 'A2' 'A3'
+printf 'p0\nMATCH\nn1\nn2\nn3\nA1\nA2\nA3\ntail\n' > e
+same "insert_after_offset 3 inserts after the third line past the match" e p
 if gnu; then
     cp in g; sed -i '/MATCH/{
       N;N;N
@@ -81,9 +105,24 @@ fi
 
 printf 'a\nMATCH\nb\n' > in
 cp in p; insert_after_offset p 'MATCH' 0 'NEW'
+printf 'a\nMATCH\nNEW\nb\n' > e
+same "insert_after_offset 0 appends directly after the match" e p
 if gnu; then
     cp in g; sed -i '/MATCH/a NEW' g
     same "insert_after_offset offset 0 equals a plain append" g p
+fi
+
+# EVERY match fires, as GNU `a` does; the helper's `!target` guard only stops a
+# second match from moving a target that is still pending, it does not make the
+# insertion first-only. delete_first_match is the one that is deliberately
+# first-only; do not assume the two agree.
+printf 'MATCH\nx\nMATCH\ny\n' > in
+cp in p; insert_after_offset p 'MATCH' 0 'NEW'
+printf 'MATCH\nNEW\nx\nMATCH\nNEW\ny\n' > e
+same "insert_after_offset fires on every match, like GNU 'a'" e p
+if gnu; then
+    cp in g; sed -i '/MATCH/a NEW' g
+    same "insert_after_offset multi-match vs sed '/re/a text'" g p
 fi
 
 # --- sed_i -------------------------------------------------------------------
