@@ -591,7 +591,9 @@ fi
 # Patch 12: mcl caml_mcl.c — add #include <stdint.h> for OCaml 5.6 trunk headers
 MCL_CAML="vendor/pplacer/mcl/caml/caml_mcl.c"
 if [ -f "$MCL_CAML" ] && ! grep -q 'stdint.h' "$MCL_CAML" 2>/dev/null; then
-  sed_i '1a #include <stdint.h>' "$MCL_CAML"
+  # insert_at_line, not sed_i: `1a text` is GNU one-line append syntax, and
+  # sed_i makes `-i` portable but passes the SCRIPT through verbatim.
+  insert_at_line "$MCL_CAML" 1 '#include <stdint.h>'
   echo "  [12] mcl caml_mcl.c: added #include <stdint.h>."
 elif [ -f "$MCL_CAML" ]; then
   echo "  [12] mcl caml_mcl.c: already patched."
