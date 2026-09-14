@@ -80,6 +80,19 @@ pkg install autoconf automake libtool m4 pkgconf gmake \
             curl libev libevent pcre
 ```
 
+`make setup` puts `/usr/local/include` and `/usr/local/lib` on the C
+toolchain's search path for you (`scripts/lib-portable.sh`). You need this
+because FreeBSD's base clang searches **neither**: its default list is only
+`/usr/lib/clang/<v>/include` and `/usr/include`, so a vendored C stub that
+includes a pkg-installed header fails with `fatal error: 'gsl/gsl_vector.h'
+file not found` even though the package is installed. Set `LOCALBASE` if your
+packages are somewhere other than `/usr/local`. Building a benchmark by hand,
+outside `make setup`, may need the same:
+
+```sh
+export C_INCLUDE_PATH=/usr/local/include LIBRARY_PATH=/usr/local/lib
+```
+
 Two differences from the apt list, both deliberate:
 
 * **No zlib, and no C toolchain.** FreeBSD ships both in the base system, so
