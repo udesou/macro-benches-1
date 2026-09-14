@@ -32,7 +32,9 @@ clone_pinned mcl "${PPLACER_DIR}/mcl"
 # already present, so a re-run of an unchanged pin costs nothing.
 if [ ! -f "${PPLACER_DIR}/mcl/src/mcl/libmcl.a" ]; then
   echo "Building mcl C libraries..."
-  (cd "${PPLACER_DIR}/mcl" && ./configure --quiet && make -j"$(ncpu)" --quiet)
+  # `-s`, not `--quiet`: the POSIX spelling, accepted by both bmake and gmake
+  # (GNU treats it as --silent).  BSD make rejects the long option outright.
+  (cd "${PPLACER_DIR}/mcl" && ./configure --quiet && make -j"$(ncpu)" -s)
 else
   echo "  mcl C libraries already built. Skipping."
 fi
