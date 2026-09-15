@@ -956,6 +956,155 @@ else
 fi
 echo ""
 
+# Patch 26: owl OpenMP link flags on FreeBSD.
+# owl's stubs compile but fail to LINK there:
+#   ld: error: undefined symbol: __kmpc_fork_call
+#   ld: error: undefined symbol: __kmpc_for_static_init_8
+# Those __kmpc_* symbols are emitted by the compiler for `#pragma omp`, so
+# something is passing -fopenmp at compile time while nothing adds the OpenMP
+# runtime at link time. libomp.so is present in the FreeBSD base system, so it
+# is purely a missing flag.
+#
+# Two holes, and this closes both:
+#
+#  (a) get_openmp_config matches "linux"/"linux_elf" -> -lgomp, "macosx" ->
+#      -lomp, "mingw64" -> -lgomp, and everything else falls to `_ -> [], []`.
+#      FreeBSD lands there and gets no flags at all. Its cc is clang, so the
+#      right pair is the macOS one without -Xpreprocessor: -fopenmp / -lomp.
+#      This only fires when OWL_ENABLE_OPENMP=1, which is NOT the default
+#      (bgetenv returns 0 when the variable is unset).
+#
+#  (b) which is why (a) alone is probably not what bit rosemary. openblas_conf
+#      comes from `pkg-config openblas`, and FreeBSD's openblas is built with
+#      OpenMP threading, so its .pc can put -fopenmp into cflags even when
+#      owl's own OpenMP support is switched off. Then cflags has -fopenmp and
+#      libs has no runtime, which is exactly the observed symptom. So also add
+#      -lomp whenever the assembled cflags ask for OpenMP and the assembled
+#      libs carry no runtime yet.
+#
+# Both are confined to FreeBSD, so Linux keeps -fopenmp/-lgomp and macOS keeps
+# -Xpreprocessor. UNVERIFIED on hardware: the (b) diagnosis is inferred from
+# the link error plus the flag assembly, not observed, so if owl still fails
+# after this, dump the assembled cflags/libs rather than guessing again.
+OWL_CONFIGURE="duniverse/owl/src/owl/config/configure.ml"
+if [ -f "$OWL_CONFIGURE" ]; then
+  if grep -q 'freebsd' "$OWL_CONFIGURE" 2>/dev/null; then
+    echo "  [26] owl OpenMP: already patched."
+  else
+    python3 - "$OWL_CONFIGURE" <<'PYEOF'
+import sys
+
+p = sys.argv[1]
+s = open(p).read()
+
+# (a) the missing match arm
+old = '      | "macosx"    -> [ "-Xpreprocessor"; "-fopenmp" ], [ "-lomp" ]\n'
+new = old + (
+    '      (* FreeBSD cc is clang, but unlike macOS it needs no -Xpreprocessor. *)\n'
+    '      | "freebsd"   -> [ "-fopenmp" ], [ "-lomp" ]\n'
+)
+if old not in s:
+    sys.exit("  [26] owl OpenMP: get_openmp_config not in the expected shape")
+s = s.replace(old, new, 1)
+
+# (b) the runtime that pkg-config's -fopenmp never brings with it
+old2 = (
+    '      if not @@ C.c_test c test_linking ~c_flags:cflags ~link_flags:libs\n'
+    '      then (\n'
+    '        Printf.printf\n'
+)
+new2 = (
+    '      (* FreeBSD: -fopenmp can arrive via pkg-config (openblas is built\n'
+    '         with OpenMP there) while owl own OpenMP support is off, leaving\n'
+    '         the __kmpc_* symbols undefined at link. Add the runtime when the\n'
+    '         flags ask for OpenMP and nothing has supplied it. No-op\n'
+    '         elsewhere. *)\n'
+    '      let libs =\n'
+    '        if get_os_type c = "freebsd"\n'
+    '           && List.exists (fun f -> f = "-fopenmp") cflags\n'
+    '           && not (List.exists (fun l -> l = "-lomp" || l = "-lgomp") libs)\n'
+    '        then libs @ [ "-lomp" ]\n'
+    '        else libs\n'
+    '      in\n'
+) + old2
+if s.count(old2) != 1:
+    sys.exit("  [26] owl OpenMP: the flag assembly is not in the expected shape")
+s = s.replace(old2, new2, 1)
+
+open(p, "w").write(s)
+print("  [26] owl OpenMP: added the FreeBSD -fopenmp/-lomp handling.")
+PYEOF
+  fi
+else
+  echo "  [26] owl OpenMP: not vendored. Skipping."
+fi
+echo ""
+
+# Patch 27: gsl-ocaml discover -- stop assuming gsl headers are in /usr/include.
+# pplacer dies in a dune rule with
+#   Fatal error: exception Sys_error("/usr/include/gsl/gsl_cdf.h: No such
+#   file or directory")
+# because src/config/discover.ml hardcodes
+#   let default_gsl_include = [ "/usr/include" ]
+# and on FreeBSD gsl is under LOCALBASE (/usr/local/include).
+#
+# Why the default is even reached, when pkg-config IS installed and gsl.pc
+# exists: discover only uses pkg-config's answer if it can find a -I flag in
+# the --cflags output, and pkgconf STRIPS -I/usr/local/include because that
+# directory is in its system include list. So --cflags comes back with no -I,
+# the search finds nothing, and the hardcoded default is what gets used.
+#
+# This is the one member of the /usr/local class that a compiler search path
+# cannot fix: the literal is read by OCaml and used to open a file, never
+# passed to the compiler, so C_INCLUDE_PATH is irrelevant to it.
+#
+# Probe instead of assume. /usr/include stays ahead of /usr/local/include, so
+# a Linux box resolves exactly as before; LOCALBASE, when set, is tried first
+# so a non-default pkg prefix works.
+GSL_DISCOVER="duniverse/gsl-ocaml/src/config/discover.ml"
+if [ -f "$GSL_DISCOVER" ]; then
+  if grep -q 'gsl_cdf.h' "$GSL_DISCOVER" 2>/dev/null; then
+    echo "  [27] gsl-ocaml include search: already patched."
+  else
+    python3 - "$GSL_DISCOVER" <<'PYEOF'
+import sys
+
+p = sys.argv[1]
+s = open(p).read()
+old = '        let default_gsl_include = [ "/usr/include" ] in\n'
+new = (
+    '        (* Probe, do not assume. On FreeBSD gsl is under LOCALBASE, and\n'
+    '           pkgconf strips -I/usr/local/include from --cflags because that\n'
+    '           path is in its system include list, so the -I search below\n'
+    '           finds nothing and this default is what is used. /usr/include\n'
+    '           stays first, so Linux resolves exactly as before. *)\n'
+    '        let default_gsl_include =\n'
+    '          let candidates =\n'
+    '            (match Sys.getenv_opt "LOCALBASE" with\n'
+    '             | Some pfx -> [ Filename.concat pfx "include" ]\n'
+    '             | None -> [])\n'
+    '            @ [ "/usr/include"; "/usr/local/include"; "/opt/homebrew/include" ]\n'
+    '          in\n'
+    '          match\n'
+    '            List.find_opt\n'
+    '              (fun d -> Sys.file_exists (Filename.concat d "gsl/gsl_cdf.h"))\n'
+    '              candidates\n'
+    '          with\n'
+    '          | Some d -> [ d ]\n'
+    '          | None -> [ "/usr/include" ]\n'
+    '        in\n'
+)
+if s.count(old) != 1:
+    sys.exit("  [27] gsl-ocaml include search: not in the expected shape")
+open(p, "w").write(s.replace(old, new, 1))
+print("  [27] gsl-ocaml include search: now probes for gsl/gsl_cdf.h.")
+PYEOF
+  fi
+else
+  echo "  [27] gsl-ocaml include search: not vendored. Skipping."
+fi
+echo ""
+
 # [22] sedlex unicode.ml: stop regenerating it from a live download.
 #
 # duniverse/sedlex/src/syntax/dune has a `(mode promote)` rule that regenerates

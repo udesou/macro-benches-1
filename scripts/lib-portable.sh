@@ -54,6 +54,25 @@ fi
 # the same text in some cases and silently not in others. Bracket forms are
 # unambiguous in both dialects, so call sites use those.
 
+# gnu_make -- the name of GNU make on this system.
+#
+# Not every vendored Makefile is portable. camlidl's uses GNU conditionals
+# (`ifneq`/`endif`), which FreeBSD's bmake rejects outright:
+#   make: "lib/Makefile" line 27: Invalid line "ifneq ..."
+# That is SYNTAX, so unlike the `--quiet` flag it cannot be worked around by
+# changing how make is called: it needs GNU make. FreeBSD ships it as `gmake`.
+#
+# On Linux `make` IS GNU make and `gmake` is usually absent, so this resolves
+# to `make` there and nothing changes. Only use it for a Makefile that actually
+# needs GNU make: mcl's, for instance, is portable and builds fine with bmake.
+gnu_make() {
+    if command -v gmake >/dev/null 2>&1; then
+        printf 'gmake'
+    else
+        printf 'make'
+    fi
+}
+
 # sed_i <sed args...> <file>
 #
 # In-place sed without -i. Writes to a temp file and copies back, which

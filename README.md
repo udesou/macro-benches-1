@@ -66,7 +66,7 @@ explain the details and what coverage they would add back.
 ### Prerequisites
 
 ```bash
-sudo apt install build-essential autoconf automake m4 pkg-config \
+sudo apt install build-essential autoconf automake m4 pkg-config zip \
                  libgmp-dev libmpfr-dev libevent-dev libcurl4-openssl-dev \
                  libpcre3-dev zlib1g-dev libopenblas-dev liblapacke-dev \
                  libgsl-dev libsqlite3-dev libyaml-dev
@@ -75,7 +75,7 @@ sudo apt install build-essential autoconf automake m4 pkg-config \
 On FreeBSD, as root:
 
 ```sh
-pkg install autoconf automake libtool m4 pkgconf gmake \
+pkg install autoconf automake libtool m4 pkgconf gmake zip \
             gmp mpfr openblas lapacke gsl sqlite3 libyaml perl5 \
             curl libev libevent pcre
 ```
@@ -106,8 +106,16 @@ Two differences from the apt list, both deliberate:
   satisfied by accident, because `libgio-2.0-dev` and `libselinux1-dev` drag
   `libpcre2-dev` in. It has been dropped from the template and the lock.
 
-**devkit needs a source patch on FreeBSD, which `make setup` applies for you**
-(patch 25). It calls `U.gettid ()`, where `U = ExtUnix.Specific`, and
+Four suites need a source patch on FreeBSD, all applied by `make setup`:
+**devkit** (patch 25, below), **owl** (patch 26: OpenMP link flags, since
+`-fopenmp` can arrive from `pkg-config openblas` while nothing adds `-lomp`),
+**pplacer** (patch 27: `gsl-ocaml`'s discover hardcodes `/usr/include`, and
+pkgconf strips `-I/usr/local/include` from its output so the hardcoded default
+is what gets used), and **goblint**, whose apron chain needs GNU make because
+camlidl's Makefile uses GNU conditionals that bmake rejects as a syntax error
+(`scripts/vendor-apron.sh` now calls `gmake` where available).
+
+On devkit specifically: it calls `U.gettid ()`, where `U = ExtUnix.Specific`, and
 `ExtUnix.Specific` exposes only what the platform actually has. extunix already
 implements `gettid` four ways, but its `discover.ml` probe matches none of them
 on FreeBSD purely on spelling: FreeBSD calls it `pthread_getthreadid_np()` in
@@ -118,7 +126,12 @@ alternative; Linux is unaffected, since `pthread_np.h` does not exist there and
 the probe still falls through to `SYS_gettid`.
 
 This is the same list CI installs, so it is the one that is actually exercised on
-a clean machine. Notably `liblapacke-dev` is separate from `libopenblas-dev` —
+a clean machine. `zip` is a plain command-line tool rather than a library, needed by
+`scripts/vendor-infer-corpus.sh`; without it infer's corpus step fails with
+`zip: command not found`. It was missing from this list until a FreeBSD run
+hit it, so a minimal Linux image can hit it too.
+
+Notably `liblapacke-dev` is separate from `libopenblas-dev` —
 owl links `-llapacke`, and without it the build fails at link time with
 `/usr/bin/ld: cannot find -llapacke`.
 
