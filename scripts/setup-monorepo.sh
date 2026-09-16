@@ -1177,6 +1177,51 @@ else
 fi
 echo ""
 
+# Patch 29: CIL's real-GCC search -- FreeBSD spells versioned GCC without a
+# hyphen. goblint dies at configure time with
+#   Fatal error: exception Failure("couldn't find real gcc")
+# because duniverse/cil/bin/realGccConfigure.ml only ever tries "gcc" and the
+# hyphenated "gcc-7" .. "gcc-16". FreeBSD's pkg installs gcc14, gcc13 and so
+# on, with no hyphen, so every candidate misses and CIL concludes there is no
+# real GCC on a machine that has one.
+#
+# It has to be real GCC: CIL's own is_bad_gcc_version rejects anything whose
+# --version mentions clang/apple/darwin, which is correct (goblint needs gcc
+# semantics, and `cc` on FreeBSD is clang). The FreeBSD gcc14 package passes
+# that check, so the only thing missing is the spelling.
+#
+# Unhyphenated names go AFTER plain "gcc", so where a plain gcc exists (every
+# Linux box) the chosen compiler does not change; the extra candidates simply
+# do not exist there. Newest first, matching the existing list's order.
+CIL_GCC="duniverse/cil/bin/realGccConfigure.ml"
+if [ -f "$CIL_GCC" ]; then
+  if grep -q '"gcc14"' "$CIL_GCC" 2>/dev/null; then
+    echo "  [29] cil real-gcc search: already patched."
+  else
+    python3 - "$CIL_GCC" <<'PYEOF'
+import sys
+
+p = sys.argv[1]
+s = open(p).read()
+old = 'let gccs = [\n  "gcc";\n'
+new = (
+    'let gccs = [\n'
+    '  "gcc";\n'
+    '  (* FreeBSD pkg installs versioned GCC unhyphenated: gcc14, not gcc-14.\n'
+    '     After plain "gcc", so nothing changes where that exists. *)\n'
+    '  "gcc16"; "gcc15"; "gcc14"; "gcc13"; "gcc12"; "gcc11";\n'
+)
+if s.count(old) != 1:
+    sys.exit("  [29] cil real-gcc search: gccs list not in the expected shape")
+open(p, "w").write(s.replace(old, new, 1))
+print("  [29] cil real-gcc search: added the unhyphenated FreeBSD names.")
+PYEOF
+  fi
+else
+  echo "  [29] cil real-gcc search: not vendored. Skipping."
+fi
+echo ""
+
 # [22] sedlex unicode.ml: stop regenerating it from a live download.
 #
 # duniverse/sedlex/src/syntax/dune has a `(mode promote)` rule that regenerates

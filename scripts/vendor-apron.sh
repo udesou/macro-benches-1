@@ -19,6 +19,27 @@ set -euo pipefail
 SRC="${APRON_SRC:-$(pwd)/vendor-apron-src}"
 PREFIX="${APRON_PREFIX:?set APRON_PREFIX to the per-runtime prefix dir}"
 
+# --- already built for this compiler?  then do nothing ---
+# goblint.build.sh calls this script unconditionally, and running-ng calls
+# goblint.build.sh once per BENCHMARK, so four goblint programs rebuilt the
+# whole chain four times: mpfr, camlidl, mlgmpidl and apron, plus a `git clean`
+# of the shared source trees under $SRC on every pass. That is slow, and it
+# means any transient failure in the chain repeats for each remaining program
+# instead of once.
+#
+# The stamp records the compiler the prefix was built with. $PREFIX is already
+# per-runtime (.apron_prefix-<runtime tag>), so the only way a stale prefix can
+# be reused is if the same tag is rebuilt with a different compiler, which the
+# stamp catches. Delete the prefix, or the stamp, to force a rebuild.
+_stamp="$PREFIX/.apron-stamp"
+_want="apron-prefix v1 $(ocaml -version 2>/dev/null)"
+if [ -f "$_stamp" ] && [ "$(cat "$_stamp" 2>/dev/null)" = "$_want" ] \
+   && [ -d "$PREFIX/lib/apron" ]; then
+  echo "apron prefix already built for this compiler, skipping: $PREFIX"
+  echo "PREFIX READY: $PREFIX"
+  exit 0
+fi
+
 # --- pins live in sources.yml (by commit, not by tag: a tag can be re-pointed) ---
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts/lib-sources.sh"
 mkdir -p "$SRC"
@@ -144,3 +165,7 @@ echo '(executable (name t) (libraries apron.boxMPQ))' > "$T/dune"
 echo 'let () = let _ = Box.manager_alloc () in print_string "APRON-PREFIX-OK\n"' > "$T/t.ml"
 ( cd "$T" && env OCAMLPATH="$PREFIX/lib" dune build ./t.exe >/dev/null 2>&1 \
   && CAML_LD_LIBRARY_PATH="$PREFIX/lib/stublibs" ./_build/default/t.exe )
+
+# Stamp LAST, and only after the self-test has linked apron out of this prefix.
+# A stamp written earlier would let a half-built prefix be skipped as good.
+printf '%s\n' "$_want" > "$_stamp"
