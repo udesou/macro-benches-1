@@ -106,14 +106,16 @@ Two differences from the apt list, both deliberate:
   satisfied by accident, because `libgio-2.0-dev` and `libselinux1-dev` drag
   `libpcre2-dev` in. It has been dropped from the template and the lock.
 
-Four suites need a source patch on FreeBSD, all applied by `make setup`:
+Five suites need a source patch on FreeBSD, all applied by `make setup`:
 **devkit** (patch 25, below), **owl** (patch 26: OpenMP link flags, since
-`-fopenmp` can arrive from `pkg-config openblas` while nothing adds `-lomp`),
-**pplacer** (patch 27: `gsl-ocaml`'s discover hardcodes `/usr/include`, and
-pkgconf strips `-I/usr/local/include` from its output so the hardcoded default
-is what gets used), and **goblint**, whose apron chain needs GNU make because
-camlidl's Makefile uses GNU conditionals that bmake rejects as a syntax error
-(`scripts/vendor-apron.sh` now calls `gmake` where available).
+`-fopenmp` arrives from `pkg-config openblas` while nothing adds `-lomp`;
+confirmed on FreeBSD, where `pkg-config --cflags openblas` returns
+`-I/usr/local/include -fopenmp` and `--libs` returns no OpenMP runtime),
+**pplacer** (patch 27: `gsl-ocaml`'s discover hardcodes `/usr/include` as its
+fallback, and on FreeBSD that fallback is what gets used, so it now probes for
+the headers instead), and **goblint** (patch 28, plus its apron chain needing
+GNU make because camlidl's Makefile uses GNU conditionals that bmake rejects as
+a syntax error, so `scripts/vendor-apron.sh` calls `gmake` where available).
 
 On devkit specifically: it calls `U.gettid ()`, where `U = ExtUnix.Specific`, and
 `ExtUnix.Specific` exposes only what the platform actually has. extunix already

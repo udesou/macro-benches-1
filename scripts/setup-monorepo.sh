@@ -1048,11 +1048,23 @@ echo ""
 #   let default_gsl_include = [ "/usr/include" ]
 # and on FreeBSD gsl is under LOCALBASE (/usr/local/include).
 #
-# Why the default is even reached, when pkg-config IS installed and gsl.pc
-# exists: discover only uses pkg-config's answer if it can find a -I flag in
-# the --cflags output, and pkgconf STRIPS -I/usr/local/include because that
-# directory is in its system include list. So --cflags comes back with no -I,
-# the search finds nothing, and the hardcoded default is what gets used.
+# Why the default is even reached is NOT established. The first explanation
+# recorded here, that pkgconf strips -I/usr/local/include as a system include
+# path, was measured on FreeBSD and is FALSE:
+#
+#   $ pkg-config --cflags gsl
+#   -I/usr/local/include
+#
+# pkgconf does emit the flag. So something else makes discover fall through to
+# the default: `C.Pkg_config.get c` returning None because pkg-config is not on
+# PATH in dune's build environment, or the gsl query failing because its .pc
+# lives in /usr/local/libdata/pkgconfig and PKG_CONFIG_PATH does not cover it
+# there. Both are guesses; do not treat either as settled.
+#
+# The fix below holds either way, because it does not consult pkg-config at
+# all: it probes the filesystem. That is why this is worth keeping despite the
+# cause being unknown. But if the probe ever needs changing, the reasoning
+# underneath it is not a reliable guide, so establish the real cause first.
 #
 # This is the one member of the /usr/local class that a compiler search path
 # cannot fix: the literal is read by OCaml and used to open a file, never
@@ -1102,6 +1114,66 @@ PYEOF
   fi
 else
   echo "  [27] gsl-ocaml include search: not vendored. Skipping."
+fi
+echo ""
+
+# Patch 28: goblint parallel -- pin the domainslib `select` to one answer.
+# goblint fails to build wherever domainslib happens to be installed in the
+# runtime switch:
+#   Error: Conflict between the following libraries:
+#   - "domain-local-await" in .../duniverse/domain-local-await/src
+#   - "domain-local-await" in ~/.opam/<switch>/lib/domain-local-await
+#     -> required by library "domainslib" ... -> "goblint.parallel"
+#
+# The chain: domain-local-await is a HARD dep of goblint, so opam-monorepo
+# vendors it. domainslib is a DEPOPT, so it is not vendored, and
+# src/util/parallel/dune picks an implementation with
+#   (select gobMutex.ml from (domainslib -> ...) ( -> ...))
+# When the switch happens to carry domainslib, that select resolves to the
+# domainslib branch, which drags in the SWITCH's domain-local-await alongside
+# the vendored one, and dune refuses the ambiguity.
+#
+# Whether the switch carries domainslib is not a property of this repo at all:
+# running-ng's install_deps_*.sh install it for the MICRO suite's multicore/
+# benchmarks. So a machine that ran micro before macro builds a different
+# goblint from one that did not.
+#
+# That makes this a measurement bug, not only a build failure. Left alone,
+# goblint silently switches threadpool implementation depending on what else
+# has been run on the box, and the numbers stop being comparable. Every
+# goblint figure we have was produced with the no-domainslib variants, because
+# no switch we used had domainslib until rosemary ran micro first.
+#
+# So pin it to the no-domainslib branch: deterministic everywhere, and it
+# matches the established Linux behaviour rather than changing it. Dropping
+# the domainslib alternative leaves a select with only a default, which is
+# valid dune.
+GOBLINT_PARALLEL="duniverse/analyzer/src/util/parallel/dune"
+if [ -f "$GOBLINT_PARALLEL" ]; then
+  if ! grep -q 'domainslib ->' "$GOBLINT_PARALLEL" 2>/dev/null; then
+    echo "  [28] goblint parallel select: already patched."
+  else
+    python3 - "$GOBLINT_PARALLEL" <<'PYEOF'
+import re
+import sys
+
+p = sys.argv[1]
+s = open(p).read()
+# Drop every `(domainslib -> <file>)` alternative, leaving each select's
+# default. Whitespace differs between the two blocks in this file, so match
+# the line rather than an exact string.
+new, n = re.subn(r'^[ \t]*\(domainslib -> [^\n]*\)\n', '', s, flags=re.M)
+if n != 2:
+    sys.exit("  [28] goblint parallel select: expected 2 domainslib "
+             "alternatives, found %d" % n)
+if 'no-domainslib' not in new:
+    sys.exit("  [28] goblint parallel select: no-domainslib default missing")
+open(p, "w").write(new)
+print("  [28] goblint parallel select: pinned to the no-domainslib variants.")
+PYEOF
+  fi
+else
+  echo "  [28] goblint parallel select: not vendored. Skipping."
 fi
 echo ""
 
