@@ -61,6 +61,8 @@ runtime-feature coverage matrix and gaps, the gotchas, and the backlog.
 - `scripts/` — `setup-monorepo.sh`, `vendor-*.sh` (coq, apron, frama-c, cpdf, …),
   `ci-build-all.sh` / `ci-run-all.sh` / `ci-manifest.py` (the CI phases).
 - `.github/workflows/ci.yml` — master-only build + run-once gate (see §CI).
+- `.github/workflows/ci-freebsd.yml` — the same gate on FreeBSD, in a VM; a
+  measurement rather than a gate for now (see §CI).
 - `sources.yml`, `macro-bench-*.opam(.template)`, `dune-workspace`, `dune-overlays`.
 - `_build-<runtime>/` — per-runtime dune build output (gitignored).
 
@@ -150,6 +152,16 @@ The gate is enforced by branch protection on `master`: the required check is
 GitHub matches required checks **by name**, so putting `5.5.0` in the label would
 orphan the requirement the moment the compiler is bumped.
 
+Before those, two suites that cost under a second: `scripts/tests/
+test-lib-portable.sh` and `test-build-scripts-portable.sh`. The first asserts every
+helper in `lib-portable.sh` is byte-identical to the GNU command it replaces, which
+**requires GNU userland** — on FreeBSD those comparisons are skipped and it reports
+14 checks where Linux reports 24. So the FreeBSD job cannot cover for the Linux one
+or vice versa; both run both. The second is static (it checks every build script
+sources `lib-portable.sh`), which matters because the LOCALBASE export that line
+carries is gated off on Linux: a script that stops sourcing it breaks only on
+FreeBSD, and only this check sees it here.
+
 Three phases, all driven off `benchmarks/manifest.yml`:
 
 - `scripts/ci-manifest.py check` — runs first because it costs seconds. It compares
@@ -219,6 +231,37 @@ Notes for whoever touches this next:
   that a *cold* setup still works: that every pinned commit and tarball is still
   fetchable, that the rocq bootstrap works from nothing, and that the cache we
   rely on the rest of the week isn't hiding a broken setup path.
+
+### FreeBSD (`.github/workflows/ci-freebsd.yml`)
+
+The same three phases on FreeBSD 15.1, the release the port was validated on
+(95/95 by hand). GitHub has no FreeBSD runners and Cirrus CI, which had native
+ones, **shut down 2026-06-01**, so this runs `vmactions/freebsd-vm` (pinned to a
+commit) inside a Linux runner. `/dev/kvm` is present on `ubuntu-latest`, so the
+guest is hardware-accelerated rather than emulated; VM boot is ~3.5 min.
+
+Its steps **deliberately mirror `ci.yml` name for name and in order**, so the two
+can be read side by side and drift is visible. What differs, and why:
+
+- three extra steps at the front (report virtualisation support, free host disk,
+  boot the VM) with no Linux counterpart;
+- `ocaml/setup-ocaml@v3` becomes `Set up the OCaml switch`, because that action is
+  a GitHub Action and does not run inside the VM;
+- `pkg` replaces `apt`, with README's shorter FreeBSD list (zlib and the C
+  toolchain are in the base system; nothing uses PCRE2). **`gmake` is not
+  optional** — camlidl's and camlzip's Makefiles use GNU conditionals bmake
+  rejects as a syntax error. opam is packaged as `ocaml-opam`.
+- `sync: nfs`, not the default rsync: the VM persists and every step runs in it
+  via `shell: freebsd {0}`, and rsync would copy the whole workspace in and back
+  around *each* step.
+
+**It is a measurement, not yet a gate**: `continue-on-error`, no cache, and fewer
+triggers (no `push: [master]`, no cron) until a first run says how long a cold
+FreeBSD build takes. Caching needs the opam root inside the workspace for
+`actions/cache` to see it, which is gigabytes of churn per run; that trade is
+worth making only once the job is known to be viable. `OPAMROOT` is `/opamroot`,
+outside the workspace, for the same reason. The missing triggers and the cache go
+in together with the change that makes it a gate.
 
 ## Vendored source pins
 
