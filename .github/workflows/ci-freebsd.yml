@@ -28,6 +28,20 @@ name: CI (FreeBSD)
 # to live inside the workspace for actions/cache to see them. That is real
 # plumbing, and adding it before knowing whether the job is viable at all would
 # be guessing twice.
+# Deliberately fewer triggers than ci.yml, for as long as this is a measurement:
+#
+#   - no `push: [master]`. ci.yml has one because required checks are not
+#     `strict`, so two PRs can each be green against an older master and still
+#     break it together, and without a post-merge run nothing notices until the
+#     next PR. This job has the same exposure and should get the same trigger,
+#     but not while it is non-gating and its runtime is unknown: it would burn a
+#     VM on every merge to tell nobody anything.
+#   - no weekly `schedule`. ci.yml's cold run exists to check that a cold setup
+#     still works when the cache is bypassed. Every run here is already cold,
+#     because there is no cache, so the cron would add nothing today. It becomes
+#     necessary at the same moment caching does.
+#
+# Both go in together with the change that makes this a gate.
 on:
   pull_request:
     branches: [master]
@@ -35,7 +49,11 @@ on:
 
 concurrency:
   group: ci-freebsd-${{ github.ref }}
-  cancel-in-progress: true
+  # Same rule as ci.yml, and for the same reason: superseding a PR run is what
+  # you want, but cancelling a master run would leave the merge that triggered
+  # it unverified. Written conditionally now so it is already correct when the
+  # push trigger is added (see the note on triggers below).
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   freebsd:
@@ -86,6 +104,20 @@ jobs:
 
       # The vendored tree plus a from-source compiler needs more room than a
       # stock runner leaves free once its preinstalled toolchains are counted.
+      # ci.yml resolves this to fold the SHA into its cache keys AND to record
+      # what was tested. Only the second reason applies here (no cache yet), but
+      # it is the one that matters for a moving compiler: a trunk run that does
+      # not say which trunk is a result nobody can act on.
+      - name: Resolve compiler identity
+        run: |
+          if [ "${{ matrix.label }}" = "trunk" ]; then
+            sha="$(curl -fsSL https://api.github.com/repos/ocaml/ocaml/commits/trunk \
+                   | python3 -c 'import json,sys; print(json.load(sys.stdin)["sha"][:12])')"
+            echo "### Compiler: ocaml/ocaml trunk @ \`${sha}\`" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "### Compiler: OCaml ${{ matrix.ocaml }}" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Free disk space on the host
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
@@ -178,6 +210,13 @@ jobs:
             bash scripts/ci-run-all.sh
 
             phase "done"
+
+      # As in ci.yml. Worth more here: the host is carrying a VM image on top of
+      # the vendored tree, and running out of disk looks like an unrelated build
+      # failure.
+      - name: Disk usage
+        if: always()
+        run: df -h /
 
       - name: Upload logs
         if: always()

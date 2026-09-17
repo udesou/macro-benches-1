@@ -95,6 +95,21 @@ jobs:
           ocaml-compiler: ${{ matrix.ocaml }}
           cache-prefix: ${{ steps.compiler.outputs.id }}
 
+      # Cheaper still, and this is the ONLY place the GNU half of these can run.
+      # Each helper in lib-portable.sh is asserted to produce byte-identical
+      # output to the GNU command it replaces, which requires GNU userland: on
+      # FreeBSD those comparisons are skipped and the suite reports 14 checks
+      # where this reports 24. So the FreeBSD job cannot cover for this one.
+      #
+      # test-build-scripts-portable.sh is here for the opposite reason: the
+      # LOCALBASE export it guards is gated off on Linux, so a build script that
+      # stops sourcing lib-portable.sh is invisible here at runtime and only
+      # breaks on FreeBSD. The check is static, so it catches it anyway.
+      - name: Portability helpers and build-script wiring
+        run: |
+          bash scripts/tests/test-lib-portable.sh
+          bash scripts/tests/test-build-scripts-portable.sh
+
       # Cheap and first: fails in seconds on a benchmark that was added without a
       # manifest entry (or vice versa), rather than 40 minutes into a build.
       - name: Validate the manifest against the tree
