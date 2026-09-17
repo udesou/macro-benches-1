@@ -229,12 +229,39 @@ jobs:
           # in a container with the workspace bind-mounted.
           git config --global --add safe.directory '*'
 
+
+      # Everything from here runs on VM-LOCAL DISK, not on the mounted
+      # workspace, and every step below starts by cd'ing into it.
+      #
+      # The mount is an NFS export owned by the host's `runner` while the VM
+      # runs as root, and that mismatch broke three separate things before this
+      # step existed: git refused the tree ("detected dubious ownership"), tar
+      # could not restore ownership (EPERM under root squash), and mv could not
+      # copy BSD file flags ("chflags: Operation not supported"). Each was fixed
+      # individually, and each time the next one appeared one stage later.
+      #
+      # None of those are portability bugs. They are what running as a different
+      # uid across a network filesystem does, and Linux in a container with a
+      # bind-mounted workspace behaves the same way. Copying once and building
+      # locally removes the whole class rather than the next symptom, and it
+      # also keeps dune's build directory off NFS, where its locking and
+      # many-small-files behaviour is its own risk.
+      #
+      # Only ci-logs/ needs to come back, and the upload step brings it.
+      - name: Copy the workspace to VM-local disk
+        shell: freebsd {0}
+        run: |
+          mkdir -p /work
+          cp -R "$GITHUB_WORKSPACE"/. /work/
+          cd /work && git rev-parse --short HEAD && df -h /work
+
       # ci.yml's ocaml/setup-ocaml@v3 is a GitHub Action and does not run inside
       # the VM, so the switch is created by hand. --disable-sandboxing because
       # opam's sandbox is bwrap-based and Linux-only.
       - name: Set up the OCaml switch
         shell: freebsd {0}
         run: |
+          cd /work
           opam init --bare --disable-sandboxing --no-setup
           opam switch create ci "${{ matrix.ocaml }}"
           opam exec --switch=ci -- ocamlc -version
@@ -245,17 +272,19 @@ jobs:
       - name: Portability helpers and build-script wiring
         shell: freebsd {0}
         run: |
+          cd /work
           bash scripts/tests/test-lib-portable.sh
           bash scripts/tests/test-build-scripts-portable.sh
           for f in scripts/*.sh benchmarks/*/*.build.sh; do bash -n "$f"; done
 
       - name: Validate the manifest against the tree
         shell: freebsd {0}
-        run: python3 scripts/ci-manifest.py check
+        run: cd /work && python3 scripts/ci-manifest.py check
 
       - name: Install dune (${{ matrix.dune }})
         shell: freebsd {0}
         run: |
+          cd /work
           eval "$(opam env --switch=ci --set-switch)"
           if [ "${{ matrix.dune }}" = "dev" ]; then
             opam pin add --yes dune --dev-repo
@@ -268,6 +297,7 @@ jobs:
       - name: Set up the monorepo (vendor sources, patch, bootstrap rocq)
         shell: freebsd {0}
         run: |
+          cd /work
           eval "$(opam env --switch=ci --set-switch)"
           # As on Linux: the switch just created is both the tools switch and
           # the runtime under test, and SKIP_TEST_BUILD avoids compiling the
@@ -278,14 +308,26 @@ jobs:
       - name: Build every benchmark
         shell: freebsd {0}
         run: |
+          cd /work
           eval "$(opam env --switch=ci --set-switch)"
           bash scripts/ci-build-all.sh
 
       - name: Run every benchmark once
         shell: freebsd {0}
         run: |
+          cd /work
           eval "$(opam env --switch=ci --set-switch)"
           bash scripts/ci-run-all.sh
+
+      # The artifact upload runs on the host and can only see the workspace, so
+      # the one thing worth keeping has to come back off the local disk.
+      - name: Collect logs from the VM
+        if: always()
+        continue-on-error: true
+        shell: freebsd {0}
+        run: |
+          [ -d /work/ci-logs ] || exit 0
+          cp -R /work/ci-logs "$GITHUB_WORKSPACE"/
 
       - name: Disk and cache usage
         if: always()
@@ -295,7 +337,7 @@ jobs:
         shell: freebsd {0}
         run: |
           df -h
-          du -sh duniverse vendor _rocq_prefix _build-ci 2>/dev/null || true
+          cd /work 2>/dev/null && du -sh duniverse vendor _rocq_prefix _build-ci 2>/dev/null || true
 
       - name: Upload logs
         if: always()
