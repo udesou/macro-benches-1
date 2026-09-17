@@ -202,6 +202,18 @@ jobs:
             exit 1
           }
 
+          # The workspace is NFS-mounted from the host, where it belongs to the
+          # `runner` user, while everything here runs as root. git refuses to
+          # touch a repository owned by somebody else ("detected dubious
+          # ownership"), which stops the vendoring dead at the first pinned
+          # clone it tries to inspect. actions/checkout does exactly this on the
+          # host for the same reason; the VM is a second user and needs it too.
+          #
+          # Not a portability problem: it is an artefact of running as a
+          # different uid across a mount, and would happen identically on Linux
+          # in a container with the workspace bind-mounted.
+          git config --global --add safe.directory '*'
+
       # ci.yml's ocaml/setup-ocaml@v3 is a GitHub Action and does not run inside
       # the VM, so the switch is created by hand. --disable-sandboxing because
       # opam's sandbox is bwrap-based and Linux-only.
