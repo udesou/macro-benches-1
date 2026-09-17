@@ -108,6 +108,21 @@ jobs:
       # Outside the workspace on purpose: see the note on caching above.
       OPAMROOT: /opamroot
       OPAMYES: "1"
+      # opam on FreeBSD defaults to the base system's /usr/bin/fetch, which
+      # fails on GitHub's release redirects:
+      #
+      #   fetch: https://github.com/dune-universe/camlzip/releases/download/
+      #   v1.11%2Bdune/camlzip-1.11.dune.tbz: Authentication error
+      #
+      # opam understands "curl" as a value here and supplies the right
+      # invocation itself, so this is not a hand-rolled command that can drift
+      # from what opam expects. curl is installed with the other dependencies.
+      #
+      # Whether fetch is failing on the redirect to the signed asset URL or on
+      # rate limiting from GitHub Actions addresses is not established; curl is
+      # the robust choice either way, and is what the Linux job effectively uses
+      # through setup-ocaml.
+      OPAMFETCH: curl
 
     steps:
       - uses: actions/checkout@v4
@@ -162,7 +177,7 @@ jobs:
           usesh: true
           mem: 12288
           sync: nfs
-          envs: "RUNNING_OCAML_RUNTIME_NAME OPAMROOT OPAMYES"
+          envs: "RUNNING_OCAML_RUNTIME_NAME OPAMROOT OPAMYES OPAMFETCH"
           run: |
             freebsd-version
             sysctl -n hw.ncpu hw.physmem
