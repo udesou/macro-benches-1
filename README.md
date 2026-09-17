@@ -66,7 +66,7 @@ explain the details and what coverage they would add back.
 ### Prerequisites
 
 ```bash
-sudo apt install build-essential autoconf automake m4 pkg-config zip \
+sudo apt install build-essential autoconf automake m4 pkg-config zip python3-yaml \
                  libgmp-dev libmpfr-dev libevent-dev libcurl4-openssl-dev \
                  libpcre3-dev zlib1g-dev libopenblas-dev liblapacke-dev \
                  libgsl-dev libsqlite3-dev libyaml-dev
@@ -75,7 +75,7 @@ sudo apt install build-essential autoconf automake m4 pkg-config zip \
 On FreeBSD, as root:
 
 ```sh
-pkg install autoconf automake libtool m4 pkgconf gmake zip \
+pkg install autoconf automake libtool m4 pkgconf gmake zip py311-yaml \
             gmp mpfr openblas lapacke gsl sqlite3 libyaml perl5 \
             curl libev libevent pcre
 ```
@@ -132,6 +132,12 @@ a clean machine. `zip` is a plain command-line tool rather than a library, neede
 `scripts/vendor-infer-corpus.sh`; without it infer's corpus step fails with
 `zip: command not found`. It was missing from this list until a FreeBSD run
 hit it, so a minimal Linux image can hit it too.
+
+`python3-yaml` (PyYAML) is the Python module `scripts/ci-manifest.py` imports,
+not the `libyaml-dev` C library above, which is frama-c's. Both lists carry it
+because a stock GitHub runner happens to ship it while a minimal container or a
+fresh FreeBSD host does not. On FreeBSD the package is versioned after your
+python3: `py311-yaml` for 3.11, `py312-yaml` for 3.12, and so on.
 
 Notably `liblapacke-dev` is separate from `libopenblas-dev` —
 owl links `-llapacke`, and without it the build fails at link time with

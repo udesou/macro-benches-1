@@ -180,6 +180,13 @@ jobs:
             gmp mpfr openblas lapacke gsl sqlite3 libyaml perl5 \
             curl libev libevent pcre \
             ocaml-opam python3
+          # PyYAML, for scripts/ci-manifest.py. FreeBSD names Python packages
+          # pyXY-<name>, so the version has to come from the python3 that was
+          # just installed rather than being hardcoded. Verified immediately:
+          # otherwise a missing module surfaces as a failure two steps later.
+          pyv="$(python3 -c 'import sys; print("%d%d" % sys.version_info[:2])')"
+          pkg install -y "py${pyv}-yaml"
+          python3 -c 'import yaml'
 
       # ci.yml's ocaml/setup-ocaml@v3 is a GitHub Action and does not run inside
       # the VM, so the switch is created by hand. --disable-sandboxing because
