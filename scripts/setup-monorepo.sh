@@ -204,7 +204,14 @@ else
   _cmdliner_url="$(src_field cmdliner-dune url)"
   _cmdliner_tbz="$(mktemp -d)/cmdliner.tbz"
   curl -fsSL "$_cmdliner_url" -o "$_cmdliner_tbz"
-  tar xf "$_cmdliner_tbz" -C duniverse/cmdliner --strip-components=1
+  # --no-same-owner: as root, both GNU tar and bsdtar try to restore the
+  # archive's uid/gid, which fails with EPERM wherever root cannot chown, such
+  # as an NFS export with root squashed (the FreeBSD CI mounts the workspace
+  # that way). Ownership of a vendored source tree is never wanted, and a
+  # non-root extraction already behaves like this, so the flag only makes the
+  # result independent of who runs it. Both tars accept the long form; `-o`
+  # means different things to each, so do not use it.
+  tar --no-same-owner -xf "$_cmdliner_tbz" -C duniverse/cmdliner --strip-components=1
   rm -f "$_cmdliner_tbz"
   echo "  Fetched cmdliner $(src_field cmdliner-dune version) (dune-universe overlay)."
 fi
@@ -389,7 +396,7 @@ else
     echo "ERROR: processor tarball md5 ${_proc_got}, expected ${_proc_want}" >&2
     exit 1
   fi
-  tar xzf "${_proc_tgz}" -C vendor/processor --strip-components=1
+  tar --no-same-owner -xzf "${_proc_tgz}" -C vendor/processor --strip-components=1
   rm -f "${_proc_tgz}"
   # Drop everything but the library.  bin/ declares an executable with
   # `(public_name ocaml-processor-dump)`, and a vendored executable's public
