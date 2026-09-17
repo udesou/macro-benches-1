@@ -35,8 +35,11 @@ _stamp="$PREFIX/.apron-stamp"
 _want="apron-prefix v1 $(ocaml -version 2>/dev/null)"
 if [ -f "$_stamp" ] && [ "$(cat "$_stamp" 2>/dev/null)" = "$_want" ] \
    && [ -d "$PREFIX/lib/apron" ]; then
-  echo "apron prefix already built for this compiler, skipping: $PREFIX"
-  echo "PREFIX READY: $PREFIX"
+  # One line, and it must not be mistakable for a build. The first version of
+  # this printed "PREFIX READY" here too, which is what the BUILD path ends
+  # with, so a skip read as a rebuild in the logs and the guard looked broken
+  # when it was working. Nothing parses either string; they are for humans.
+  echo "apron prefix: CACHED, no rebuild (stamp matches $(ocaml -version 2>/dev/null)): $PREFIX"
   exit 0
 fi
 
@@ -156,7 +159,7 @@ _log="$(mktemp)"
 rm -f "$_log"
 echo "      $(ocamlfind query apron 2>&1)"
 echo "      C libs: $(find "$PREFIX" -name 'libapron*.a' | head -1)"
-echo "PREFIX READY: $PREFIX"
+echo "apron prefix: BUILT from source: $PREFIX"
 
 # --- hermetic self-test: link apron from PREFIX only (no switch libs) ---
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
