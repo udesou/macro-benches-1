@@ -8,12 +8,15 @@ name: CI (FreeBSD)
 # which had native ones, shut down on 2026-06-01. Nested virtualisation is what
 # the projects migrating off Cirrus are using.
 #
-# THIS WORKFLOW IS A MEASUREMENT, NOT YET A GATE. It is
-# `continue-on-error` and deliberately has no cache, so the first runs answer
-# the question the design depends on: how long does a cold FreeBSD build take
-# here? The Linux gate takes ~35 minutes natively. Under emulation the factor
-# depends on whether the runner grants /dev/kvm, which is documented nowhere, so
-# the first step reports it. Three outcomes:
+# THIS WORKFLOW IS A MEASUREMENT, NOT YET A GATE. It is `continue-on-error`
+# and deliberately has no cache, so the first runs answer how long a cold
+# FreeBSD build takes here. The Linux gate takes ~35 minutes natively.
+#
+# ANSWERED by the first run: /dev/kvm IS present on ubuntu-latest (the action
+# chmods it), so the guest is hardware-accelerated rather than software-emulated
+# and should run near native speed. VM boot is about 3.5 minutes. What is still
+# unmeasured is the build itself, which is what the timestamps below report.
+# Three outcomes:
 #
 #   near 35-60 min  -> drop continue-on-error, add caching, make it a gate
 #   1-4 hours       -> keep it non-gating, or move it to the weekly cron
@@ -64,8 +67,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # The number this workflow exists to find out. Without /dev/kvm the guest
-      # is software-emulated and several times slower; with it, near native.
+      # /dev/kvm was present when this was written, which is what makes a full
+      # build plausible here at all. Kept as a check rather than an assumption:
+      # if GitHub ever stops granting it, the job does not silently become ten
+      # times slower with no explanation in the log.
       - name: Report host virtualisation support
         run: |
           {
@@ -109,7 +114,7 @@ jobs:
               bash git gmake autoconf automake libtool m4 pkgconf zip \
               gmp mpfr openblas lapacke gsl sqlite3 libyaml perl5 \
               curl libev libevent pcre \
-              opam python3 rsync
+              ocaml-opam python3
 
           run: |
             set -e
