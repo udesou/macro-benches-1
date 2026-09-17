@@ -1,0 +1,184 @@
+name: CI (FreeBSD)
+
+# The Linux gate (ci.yml) builds every benchmark and runs each once. This is the
+# same thing on FreeBSD, where the port was validated by hand (95/95 on FreeBSD
+# 15.1) but nothing checks it automatically.
+#
+# Why a VM inside a Linux runner: GitHub has no FreeBSD runners, and Cirrus CI,
+# which had native ones, shut down on 2026-06-01. Nested virtualisation is what
+# the projects migrating off Cirrus are using.
+#
+# THIS WORKFLOW IS A MEASUREMENT, NOT YET A GATE. It is
+# `continue-on-error` and deliberately has no cache, so the first runs answer
+# the question the design depends on: how long does a cold FreeBSD build take
+# here? The Linux gate takes ~35 minutes natively. Under emulation the factor
+# depends on whether the runner grants /dev/kvm, which is documented nowhere, so
+# the first step reports it. Three outcomes:
+#
+#   near 35-60 min  -> drop continue-on-error, add caching, make it a gate
+#   1-4 hours       -> keep it non-gating, or move it to the weekly cron
+#   hits the cap    -> fall back to the portability suites alone (below), which
+#                      still catch the GNU-ism class that was most of what broke
+#
+# Caching is deliberately absent for now. The VM is ephemeral and only the
+# workspace is copied back, so the opam root and the vendored trees would have
+# to live inside the workspace for actions/cache to see them. That is real
+# plumbing, and adding it before knowing whether the job is viable at all would
+# be guessing twice.
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-freebsd-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  freebsd:
+    name: "freebsd build + run once (${{ matrix.label }})"
+    runs-on: ubuntu-latest
+    # Just under GitHub's 6 hour hard cap, so a job that is merely slow reports
+    # a duration instead of being killed with nothing to show.
+    timeout-minutes: 350
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: "stable"
+            ocaml: "5.5.0"
+            # Released dune >= 3.24 breaks the vendored rocq build.
+            dune: "3.22.1"
+          - label: "trunk"
+            ocaml: "ocaml-variants.5.6.0+trunk"
+            # Released dune cannot bootstrap against 5.6 trunk; use git main.
+            dune: "dev"
+
+    env:
+      OCAML_PKG: ${{ matrix.ocaml }}
+      DUNE_VER: ${{ matrix.dune }}
+      # Picks the build dir (_build-ci) and the output binary suffix, as on Linux.
+      RUNNING_OCAML_RUNTIME_NAME: ci
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # The number this workflow exists to find out. Without /dev/kvm the guest
+      # is software-emulated and several times slower; with it, near native.
+      - name: Report host virtualisation support
+        run: |
+          {
+            echo "### FreeBSD CI host"
+            if [ -e /dev/kvm ]; then
+              echo "- \`/dev/kvm\` **present**: the VM can use hardware acceleration."
+            else
+              echo "- \`/dev/kvm\` **absent**: the VM is software-emulated, expect a large slowdown."
+            fi
+            echo "- host cpus: $(nproc), memory: $(free -g | awk '/^Mem:/{print $2}')G"
+            echo "- host disk free: $(df -h / | awk 'NR==2{print $4}')"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # The vendored tree plus a from-source compiler needs more room than a
+      # stock runner leaves free once its preinstalled toolchains are counted.
+      - name: Free disk space on the host
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+                      /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" || true
+          df -h /
+
+      - name: FreeBSD build and run
+        uses: vmactions/freebsd-vm@4469451fe39bee80be4066836c5170362e9349f3  # v1.5.7
+        with:
+          # The release the port was validated on.
+          release: "15.1"
+          usesh: true
+          mem: 12288
+          envs: "OCAML_PKG DUNE_VER RUNNING_OCAML_RUNTIME_NAME"
+
+          # `prepare` and `run` are executed with sh, not bash, so every script
+          # of ours is invoked through bash explicitly.
+          #
+          # The package list is the one in README.md, which is shorter than the
+          # Linux apt list on purpose: zlib and the C toolchain are in the base
+          # system, and nothing in the tree uses PCRE2. gmake is not optional,
+          # because camlidl's and camlzip's Makefiles use GNU conditionals that
+          # bmake rejects as a syntax error.
+          prepare: |
+            pkg install -y \
+              bash git gmake autoconf automake libtool m4 pkgconf zip \
+              gmp mpfr openblas lapacke gsl sqlite3 libyaml perl5 \
+              curl libev libevent pcre \
+              opam python3 rsync
+
+          run: |
+            set -e
+            phase() { echo ""; echo "=== $1 (t+$(($(date +%s) - T0))s) ==="; }
+            T0=$(date +%s)
+
+            # First, because both suites together take under a second and need
+            # nothing but bash. A GNU-only construct fails here rather than
+            # forty minutes into a build.
+            #
+            # They also verify something nothing else does: on Linux these drive
+            # the FreeBSD code paths through a fake `uname` and report 24
+            # checks. Here they run for real and report 14, the GNU comparisons
+            # being skipped.
+            phase "portability suites"
+            bash scripts/tests/test-lib-portable.sh
+            bash scripts/tests/test-build-scripts-portable.sh
+            for f in scripts/*.sh benchmarks/*/*.build.sh; do bash -n "$f"; done
+
+            phase "opam switch ($OCAML_PKG)"
+            # No setup-ocaml here: it is a GitHub Action and does not run inside
+            # the VM. --disable-sandboxing because opam's sandbox is bwrap-based
+            # and Linux-only.
+            export OPAMYES=1
+            # Deliberately OUTSIDE the workspace. The workspace is copied back
+            # to the host when the VM exits, and an opam root with a
+            # from-source compiler in it is gigabytes of churn that nothing on
+            # the host wants. The repo tree itself still comes back, which is
+            # what lets ci-logs/ be uploaded as an artifact.
+            #
+            # When caching is added later this has to move INTO the workspace,
+            # since actions/cache runs on the host and can only see what comes
+            # back. That trade (slower copyback, but a warm switch) only makes
+            # sense once we know the job is viable at all.
+            export OPAMROOT=/opamroot
+            opam init --bare --disable-sandboxing --no-setup
+            opam switch create ci "$OCAML_PKG"
+            eval "$(opam env --switch=ci --set-switch)"
+            if [ "$DUNE_VER" = "dev" ]; then
+              opam pin add --yes dune --dev-repo
+            else
+              opam pin add --yes --no-action dune "$DUNE_VER"
+              opam install --yes "dune.$DUNE_VER"
+            fi
+            dune --version
+
+            phase "manifest check"
+            python3 scripts/ci-manifest.py check
+
+            phase "setup-monorepo"
+            # As on Linux: the switch just created is both the tools switch and
+            # the runtime under test, and SKIP_TEST_BUILD avoids compiling the
+            # duniverse a second time into the default _build/.
+            TOOLS_SWITCH="$(opam switch show)" SKIP_TEST_BUILD=1 \
+              bash scripts/setup-monorepo.sh
+
+            phase "build every benchmark"
+            bash scripts/ci-build-all.sh
+
+            phase "run every benchmark once"
+            bash scripts/ci-run-all.sh
+
+            phase "done"
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-freebsd-logs-${{ matrix.label }}
+          path: ci-logs/
+          retention-days: 14
+          if-no-files-found: ignore
