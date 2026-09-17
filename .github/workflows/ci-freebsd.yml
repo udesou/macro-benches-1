@@ -180,13 +180,27 @@ jobs:
             gmp mpfr openblas lapacke gsl sqlite3 libyaml perl5 \
             curl libev libevent pcre \
             ocaml-opam python3
-          # PyYAML, for scripts/ci-manifest.py. FreeBSD names Python packages
-          # pyXY-<name>, so the version has to come from the python3 that was
-          # just installed rather than being hardcoded. Verified immediately:
-          # otherwise a missing module surfaces as a failure two steps later.
+          # PyYAML, for scripts/ci-manifest.py. Two things make the package name
+          # hard to state up front, so it is derived and then VERIFIED rather
+          # than asserted:
+          #
+          #   - FreeBSD names Python packages pyXY-<name>, and only builds them
+          #     for the default Python, so the XY has to come from the python3
+          #     that was actually installed rather than being hardcoded;
+          #   - the port was renamed devel/py-yaml -> devel/py-pyyaml in 2024,
+          #     so the base name differs by FreeBSD release.
+          #
+          # Hence try both spellings and let the import decide. A bare
+          # `pkg install` of the wrong name fails this step with a message about
+          # packages, which says nothing about what the build actually needs.
           pyv="$(python3 -c 'import sys; print("%d%d" % sys.version_info[:2])')"
-          pkg install -y "py${pyv}-yaml"
-          python3 -c 'import yaml'
+          pkg install -y "py${pyv}-pyyaml" || pkg install -y "py${pyv}-yaml" || true
+          python3 -c 'import yaml' || {
+            echo "PyYAML is missing: no py${pyv}-pyyaml or py${pyv}-yaml package." >&2
+            echo "scripts/ci-manifest.py needs it. Check the current name at" >&2
+            echo "  https://www.freshports.org/devel/py-pyyaml/" >&2
+            exit 1
+          }
 
       # ci.yml's ocaml/setup-ocaml@v3 is a GitHub Action and does not run inside
       # the VM, so the switch is created by hand. --disable-sandboxing because

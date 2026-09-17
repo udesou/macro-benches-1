@@ -75,7 +75,7 @@ sudo apt install build-essential autoconf automake m4 pkg-config zip python3-yam
 On FreeBSD, as root:
 
 ```sh
-pkg install autoconf automake libtool m4 pkgconf gmake zip py311-yaml \
+pkg install autoconf automake libtool m4 pkgconf gmake zip py312-pyyaml \
             gmp mpfr openblas lapacke gsl sqlite3 libyaml perl5 \
             curl libev libevent pcre
 ```
@@ -136,8 +136,10 @@ hit it, so a minimal Linux image can hit it too.
 `python3-yaml` (PyYAML) is the Python module `scripts/ci-manifest.py` imports,
 not the `libyaml-dev` C library above, which is frama-c's. Both lists carry it
 because a stock GitHub runner happens to ship it while a minimal container or a
-fresh FreeBSD host does not. On FreeBSD the package is versioned after your
-python3: `py311-yaml` for 3.11, `py312-yaml` for 3.12, and so on.
+fresh FreeBSD host does not. On FreeBSD the name has two moving parts: it is versioned after your python3
+(`py312-` for 3.12), and the port was renamed `devel/py-yaml` to
+`devel/py-pyyaml` in 2024, so older releases spell it `py311-yaml` instead.
+`python3 -c 'import yaml'` is the check that matters.
 
 Notably `liblapacke-dev` is separate from `libopenblas-dev` —
 owl links `-llapacke`, and without it the build fails at link time with
