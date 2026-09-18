@@ -1272,6 +1272,50 @@ else
 fi
 echo ""
 
+# Patch 31: zarith's version rule -- a SIGPIPE landmine under `pipefail`.
+# duniverse/Zarith/dune generates zarith_version.ml with
+#   (bash "grep \"version\" META | head -1")
+# and dune runs every (bash ...) action as `bash -e -u -o pipefail -c`. META has
+# TWO lines matching "version" (the package's own 1.14 and the zarith_top
+# subpackage's 1.13), so `head -1` exits after the first one while grep still has
+# the second to write. grep then takes SIGPIPE, pipefail promotes its 141 to the
+# pipeline's status, and the rule fails with
+#   Command exited with code 141.
+# taking the whole rocq bootstrap (step [8/9]) with it.
+#
+# Whether it fires is a buffering race, which is why it is intermittent and why
+# it showed up on FreeBSD rather than here. GNU grep block-buffers when stdout is
+# a pipe, so both lines usually land in one write() that completes before head
+# exits; FreeBSD's grep is line-buffered, so the second write happens after head
+# is gone and the race is lost far more often. Nothing about this repo makes it
+# more or less likely: it is latent on every platform.
+#
+# `grep -m1` stops after the first match, so there is no second write and no pipe
+# at all. Output is byte-identical (the first matching line), -m is in both GNU
+# and BSD grep, and Linux behaviour does not change.
+ZARITH_DUNE="duniverse/Zarith/dune"
+if [ -f "$ZARITH_DUNE" ]; then
+  if grep -q 'grep -m1' "$ZARITH_DUNE" 2>/dev/null; then
+    echo "  [31] zarith version rule: already patched."
+  else
+    python3 - "$ZARITH_DUNE" <<'PYEOF'
+import sys
+
+p = sys.argv[1]
+s = open(p).read()
+old = '(bash "grep \\"version\\" META | head -1")'
+new = '(bash "grep -m1 \\"version\\" META")'
+if s.count(old) != 1:
+    sys.exit("  [31] zarith version rule: not in the expected shape")
+open(p, "w").write(s.replace(old, new, 1))
+print("  [31] zarith version rule: dropped the head -1 pipe (SIGPIPE under pipefail).")
+PYEOF
+  fi
+else
+  echo "  [31] zarith version rule: not vendored. Skipping."
+fi
+echo ""
+
 # [22] sedlex unicode.ml: stop regenerating it from a live download.
 #
 # duniverse/sedlex/src/syntax/dune has a `(mode promote)` rule that regenerates
