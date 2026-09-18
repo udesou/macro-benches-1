@@ -255,13 +255,24 @@ can be read side by side and drift is visible. What differs, and why:
   via `shell: freebsd {0}`, and rsync would copy the whole workspace in and back
   around *each* step.
 
-**It is a measurement, not yet a gate**: `continue-on-error`, no cache, and fewer
-triggers (no `push: [master]`, no cron) until a first run says how long a cold
-FreeBSD build takes. Caching needs the opam root inside the workspace for
-`actions/cache` to see it, which is gigabytes of churn per run; that trade is
-worth making only once the job is known to be viable. `OPAMROOT` is `/opamroot`,
-outside the workspace, for the same reason. The missing triggers and the cache go
-in together with the change that makes it a gate.
+**It gates**, on the same terms as `ci.yml`: the stable leg is required, the
+trunk leg is `continue-on-error` because it tracks a moving compiler. Triggers
+match too (PR, push to master, weekly cron staggered an hour after ci.yml's).
+Measured at **26.9 min stable / 31.2 min trunk**, against ~35 for Linux, with
+`Build every benchmark` at 16.2 min being the bulk.
+
+**No cache, deliberately.** `ci.yml` caches `duniverse/`, `vendor/` and
+`_rocq_prefix/` because there they sit on local disk next to the runner. Here the
+build runs inside the VM while `actions/cache` runs on the host, so everything
+cacheable has to cross the NFS mount twice per run: ~2.7 GB (those three plus a
+from-source opam root) restored and saved, to avoid 4.5 min of work, 17% of the
+job. The much smaller checkout copy already costs 0.3-1.1 min across that mount,
+so it is at best a wash. Revisit only if the build phase itself becomes
+cacheable, since at 16 min that is what actually dominates. `OPAMROOT` is
+`/opamroot`, outside the workspace, for the same reason.
+
+Note the required check has to be enabled in branch protection separately;
+adding the leg here does not make it required.
 
 ## Vendored source pins
 

@@ -33,42 +33,55 @@ name: CI (FreeBSD)
 # what makes this measurable: GitHub reports a duration per step, so "where does
 # the time go" is answered by the run page instead of by grepping timestamps.
 #
-# THIS IS A MEASUREMENT, NOT YET A GATE. It is `continue-on-error` with no
-# cache, so the first runs answer how long a cold FreeBSD build takes. The Linux
-# gate takes ~35 minutes natively.
+# MEASURED, then promoted. The first green run took 26.9 minutes on stable and
+# 31.2 on trunk, against ~35 for the Linux gate, with no cache at all:
 #
-# ANSWERED already: /dev/kvm IS present on ubuntu-latest (the action chmods it),
-# so the guest is hardware-accelerated rather than software-emulated. VM boot is
-# about 3.5 minutes. What is unmeasured is the build. Three outcomes:
+#   free host disk      1.7m      set up the monorepo      1.9m
+#   boot the VM         0.8m      build every benchmark   16.2m
+#   install deps        0.3m      run every benchmark      2.6m
+#   copy to local disk  0.3m      ---------------------------------
+#   set up the switch   2.6m      total                   26.9m
+#   install dune        0.6m
 #
-#   near 35-60 min  -> drop continue-on-error, add caching, make it a gate
-#   1-4 hours       -> keep it non-gating, or move it to the weekly cron
-#   hits the cap    -> fall back to the portability suites alone, which still
-#                      catch the GNU-ism class that was most of what broke
+# 95 of 95 programs build and 19 of the 20 CI runs pass, on both 5.5.0 and
+# trunk. The one that did not was goblint, which found a real portability bug
+# (patch 30, the unhyphenated cpp name) rather than a problem with this job.
 #
-# No caching yet, on purpose. A cache needs the opam root inside the workspace
-# so actions/cache can see it, which is gigabytes of churn per run; choosing
-# that trade before knowing the job is viable would be guessing. OPAMROOT is
-# therefore /opamroot, outside the workspace.
+# NO CACHE, and this is a deliberate decision rather than unfinished work.
+# ci.yml caches duniverse/, vendor/ and _rocq_prefix/ because there they sit on
+# local disk next to the runner. Here the build runs inside the VM and
+# actions/cache runs on the host, so everything cacheable has to cross the NFS
+# mount twice per run:
+#
+#   cacheable:  set up the switch 2.6m + set up the monorepo 1.9m = 4.5m (17%)
+#   cost:       duniverse 0.44G + vendor 0.36G + _rocq_prefix 0.43G
+#               + the opam root with a from-source compiler ~1.5G = ~2.7 GB,
+#               restored AND saved every run
+#
+# The checkout copy, which is far smaller, already takes 0.3-1.1m across that
+# mount. Moving 2.7 GB twice to avoid 4.5 minutes of work is at best a wash and
+# more likely a loss, on top of being another failure mode in a job that has
+# had enough of them. Revisit only if the build phase itself becomes cacheable,
+# since at 16 minutes it is the part that actually dominates.
 
-# Deliberately fewer triggers than ci.yml, for as long as this is a measurement:
+# Same triggers as ci.yml now that this gates. The push run matters for the
+# same reason it does there: required checks are not `strict`, so two PRs can
+# each be green against an older master and still break it together, and without
+# a post-merge run nothing notices until the next PR.
 #
-#   - no `push: [master]`. ci.yml has one because required checks are not
-#     `strict`, so two PRs can each be green against an older master and still
-#     break it together, and without a post-merge run nothing notices until the
-#     next PR. This job has the same exposure and should get the same trigger,
-#     but not while it is non-gating and its runtime is unknown: it would burn a
-#     VM on every merge to tell nobody anything.
-#   - no weekly `schedule`. ci.yml's cold run exists to check that a cold setup
-#     still works when the cache is bypassed. Every run here is already cold,
-#     because there is no cache, so the cron would add nothing today. It becomes
-#     necessary at the same moment caching does.
-#
-# Both go in together with the change that makes this a gate.
+# The cron is staggered an hour after ci.yml's so the two are not fetching every
+# pinned source at the same moment. Its purpose differs slightly here: on Linux
+# it exists to bypass the cache, while every run here is already cold, so what
+# it adds is a weekly check that the pins are still FETCHABLE even in a week
+# with no pull requests.
 on:
   pull_request:
     branches: [master]
+  push:
+    branches: [master]
   workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * 1"
 
 concurrency:
   group: ci-freebsd-${{ github.ref }}
@@ -85,7 +98,11 @@ jobs:
     # Just under GitHub's 6 hour hard cap, so a job that is merely slow reports
     # a duration instead of being killed with nothing to show.
     timeout-minutes: 350
-    continue-on-error: true
+    # Per-leg, as in ci.yml: stable gates, trunk reports. trunk tracks a moving
+    # compiler and pinned ppxlib git main, so it goes red for reasons that have
+    # nothing to do with a change here; it did exactly that when trunk grew
+    # Pexp_hole.
+    continue-on-error: ${{ matrix.required == false }}
     strategy:
       fail-fast: false
       matrix:
@@ -95,10 +112,12 @@ jobs:
           # would orphan the requirement the moment the compiler is bumped.
           - label: "stable"
             ocaml: "5.5.0"
+            required: true
             # Released dune >= 3.24 breaks the vendored rocq build.
             dune: "3.22.1"
           - label: "trunk"
             ocaml: "ocaml-variants.5.6.0+trunk"
+            required: false
             # Released dune cannot bootstrap against 5.6 trunk; use git main.
             dune: "dev"
 
