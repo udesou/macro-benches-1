@@ -3,9 +3,10 @@
 Auto-loaded context for Claude Code (and a reference for contributors). The
 human-facing docs are `README.md` and the per-benchmark pages under
 `docs/benchmarks/<name>.md`. This file holds the operational and machine-facing
-detail that doesn't belong in either: the build-script contract, the in-process
-iteration and ring-size mechanics, the vendored-source patch table, the
-runtime-feature coverage matrix and gaps, the gotchas, and the backlog.
+detail that doesn't belong in either: the build-script contract, the CI phases,
+the in-process iteration and ring-size mechanics, the system-prerequisite and
+platform notes, the vendored-source patch table, the runtime-feature coverage
+matrix and gaps, the gotchas, and the backlog.
 
 ## What this is
 
@@ -273,6 +274,60 @@ cacheable, since at 16 min that is what actually dominates. `OPAMROOT` is
 
 Note the required check has to be enabled in branch protection separately;
 adding the leg here does not make it required.
+
+## System prerequisites, and why each one is there
+
+README lists the apt and pkg lines. What it deliberately does not carry:
+
+- **The apt list is not byte-identical to CI's.** `ci.yml` omits `zip`, because a
+  stock GitHub runner already ships it. `zip` is needed by
+  `scripts/vendor-infer-corpus.sh` (without it infer's corpus step fails with
+  `zip: command not found`), so it stays in README's list: a minimal container can
+  hit what a hosted runner cannot. Do not "resync" the two by deleting it.
+- **`liblapacke-dev` is separate from `libopenblas-dev`.** owl links `-llapacke`;
+  without it the build fails at link time with `cannot find -llapacke`.
+- **`python3-yaml` (PyYAML) is not `libyaml-dev`.** The first is the Python module
+  `scripts/ci-manifest.py` imports, the second is frama-c's C library. Both lists
+  carry both because a stock GitHub runner happens to ship PyYAML while a minimal
+  container or a fresh FreeBSD host does not.
+- **No PCRE2 anywhere.** `conf-libpcre2-8` used to sit in
+  `macro-bench-devkit.opam.template`, but nothing in the tree has ever used PCRE2:
+  devkit depends on the `pcre` OCaml library (PCRE **1**, via `conf-libpcre`),
+  there is no `Pcre2.` under `duniverse/`, and the apt list only ever installed
+  `libpcre3-dev`. On CI the requirement was satisfied by accident, because
+  `libgio-2.0-dev` and `libselinux1-dev` drag `libpcre2-dev` in. It has been
+  dropped from the template and the lock; do not put it back.
+
+### FreeBSD
+
+- **Base clang searches neither `/usr/local/include` nor `/usr/local/lib`.** Its
+  default include list is only `/usr/lib/clang/<v>/include` and `/usr/include`, so
+  a vendored C stub that includes a pkg-installed header fails with
+  `fatal error: 'gsl/gsl_vector.h' file not found` even though the package is
+  installed. `scripts/lib-portable.sh` exports `LOCALBASE` and puts both on the
+  search path; that export is gated off on Linux, which is why
+  `scripts/tests/test-build-scripts-portable.sh` statically asserts every build
+  script sources `lib-portable.sh`: a script that stops doing so breaks only on
+  FreeBSD, and only that check sees it here.
+- **`gmake` is not optional.** camlidl's and camlzip's Makefiles use GNU
+  conditionals that bmake rejects as a syntax error, so `scripts/vendor-apron.sh`
+  calls `gmake` where available.
+- **`gcc` is needed even though base clang builds everything else.** goblint is the
+  exception: CIL rejects a preprocessor whose `--version` mentions clang, which on
+  FreeBSD is `/usr/bin/cpp`. See patches 29 and 30; without a real GCC the
+  analysis aborts at **run** time with
+  `Failure("No good preprocessor (cpp) found")`, long after everything has built
+  cleanly.
+- **No zlib package.** FreeBSD ships it in the base system.
+- **The PyYAML package name has two moving parts:** it is versioned after your
+  `python3` (`py311-` for 3.11), and the port was renamed `devel/py-yaml` to
+  `devel/py-pyyaml` in 2024, so older releases spell it `py311-yaml`.
+  `ci-freebsd.yml` derives the name and then verifies `python3 -c 'import yaml'`
+  rather than asserting a spelling. Do the same by hand.
+- Five suites need a source patch on FreeBSD, all applied by `make setup`: devkit
+  (25), owl (26), pplacer (27), and goblint (29 and 30, plus its apron chain
+  needing `gmake`). Note **28 is not a FreeBSD patch**, despite sitting in that
+  run of numbers.
 
 ## Vendored source pins
 
@@ -680,8 +735,16 @@ Applied automatically by `scripts/setup-monorepo.sh`.
 | 18 | `duniverse/analyzer/.../control.ml` | Annotate `(module CFG : CfgBidirSkip)` | OCaml ≥ 5.5 can't infer the packaged-module signature otherwise |
 | 19 | `duniverse/rocq/dune-project` + `dune` | Drop `(using coq 0.8)` and the `dev`-profile `(coq (flags ...))` | dune 3.24 deleted the `coq` extension. It's a *parse* error, so it broke **every** build in the workspace, not just rocq's. Both declarations are dead here (rocq generates its theory rules via `tools/dune_rule_gen`; the only stanzas needing the extension are in `dune.disabled` files), so they're removed rather than ported to `(using rocq ...)` |
 | 20 | `duniverse/rocq/toplevel/dune` | Collapse the `(select memtrace_init.ml …)` to its `(-> memtrace_init.default.ml)` default clause | rocq-runtime has an *optional* memtrace integration (`(select)` + `depopts: memtrace`). dune auto-enables it the moment `memtrace` is present anywhere in the workspace — which it is once a benchmark vendors memtrace — so `rocq-runtime.toplevel` gains `requires memtrace` in its generated META. The rocq bootstrap's `gen_rules.exe` resolves that library through findlib on `$OCAMLPATH`, where the vendored memtrace is never installed, and dies with `findlib error: memtrace not found … required by rocq-runtime.toplevel`. Forcing the default (memtrace-free) clause keeps rocq's toplevel from ever linking/requiring memtrace, independent of any benchmark vendoring it |
+| 21 | `duniverse/sedlex` unicode download rule | Add `--fail` to the `curl` invocations | A failed download otherwise wrote an HTML error page as if it were Unicode data, and the smoke build failed non-deterministically much later |
+| 22 | `duniverse/sedlex` `unicode.ml` rule | Remove the rule that regenerates `unicode.ml` from a live download | The vendored tree already ships a generated `unicode.ml`; regenerating it made the build depend on the network. Refuses to patch (keeping the rule) if the shipped `unicode.ml` is missing or unrecognised |
 | 23 | `vendor/camlpdf/pdftree.ml` | Drop the duplicate name/number tree key warning | `cpdf_squeeze` merges N copies of one PDF, so every key collides; camlpdf logged ~13M flushed stderr lines per `_large` invocation (~830 MB of log, and stderr I/O inside the measured region). Dedup behaviour unchanged; other `Pdfe` diagnostics still print |
 | 24 | `duniverse/analyzer/src/maingoblint.ml` | Guard the `-m32`/`-m64` cpp flag on x86 hosts only | goblint's sv-comp preprocessing maps `exp.architecture` 64bit/32bit to `cpp -m64`/`-m32`, which are x86-only; on aarch64 `cpp` rejects `-m64` ("unrecognized command-line option") and every goblint analysis dies in the preprocessor. Guarded on the host actually being x86 (via `uname -m`) — x86 behaviour is unchanged, and the word size is already native on aarch64, so omitting the flag is correct |
+| 25 | `duniverse/extunix/discover/discover.ml` | Add a fifth `gettid` probe alternative: `pthread_getthreadid_np()` from `<pthread_np.h>` | FreeBSD. devkit calls `U.gettid ()` where `U = ExtUnix.Specific`, and `ExtUnix.Specific` exposes only what the platform has. extunix implements `gettid` four ways (Win32, macOS `pthread_threadid_np`, older macOS `SYS_thread_selfid`, Linux `SYS_gettid`) and FreeBSD matches none of them purely on spelling, so devkit fails to compile with `Unbound value U.gettid` and takes `benchmarks/ahrefs-devkit` with it. The probe is ordered, so Linux still wins on `SYS_gettid` and nothing changes there |
+| 26 | `duniverse/owl/src/owl/config/configure.ml` | Add FreeBSD OpenMP flags (`-fopenmp` / `-lomp`), and add `-lomp` whenever the assembled cflags ask for OpenMP and the libs carry no runtime | FreeBSD. owl's stubs compile but fail to link with `undefined symbol: __kmpc_fork_call`. Two holes: `get_openmp_config` has no FreeBSD arm (everything unmatched gets no flags), and FreeBSD's openblas is built with OpenMP threading, so `pkg-config --cflags openblas` returns `-fopenmp` while `--libs` returns no runtime. The second diagnosis is inferred from the link error and the flag assembly, not observed on hardware: if owl still fails, dump the assembled cflags/libs rather than guessing |
+| 27 | `vendor/pplacer` `gsl-ocaml` `src/config/discover.ml` | Probe for the gsl headers instead of falling back to a hardcoded `/usr/include` | FreeBSD. pplacer dies in a dune rule with `Sys_error("/usr/include/gsl/gsl_cdf.h: No such file or directory")`; gsl is under `LOCALBASE`. *Why* the default is reached is NOT established: `pkg-config --cflags gsl` does emit `-I/usr/local/include` on FreeBSD, so the earlier "pkgconf strips system include paths" explanation is false. Candidates are `C.Pkg_config.get` returning `None` (pkg-config not on PATH in dune's build env) or the gsl query failing because its `.pc` lives in `/usr/local/libdata/pkgconfig`. Both are guesses |
+| 28 | `duniverse/analyzer/src/util/parallel/dune` | Drop both `(domainslib -> …)` alternatives from the `select`, leaving the no-domainslib defaults | Platform-independent, and a **measurement** bug, not just a build failure. `domain-local-await` is a hard dep of goblint so opam-monorepo vendors it; `domainslib` is a depopt so it is not. When the runtime switch happens to carry domainslib the select resolves to the domainslib branch, which drags in the *switch's* `domain-local-await` alongside the vendored one, and dune refuses the ambiguity. Whether the switch carries domainslib is not a property of this repo: running-ng's `install_deps_*.sh` install it for the micro suite's `multicore/` benchmarks, so a machine that ran micro before macro built a different goblint. Pinned to the no-domainslib branch, which is what every goblint figure we have was produced with |
+| 29 | `duniverse/cil/bin/realGccConfigure.ml` | Also try unhyphenated versioned GCC names (`gcc14`, `gcc13`, …), after plain `gcc` | FreeBSD. goblint dies at configure time with `couldn't find real gcc`: CIL only tries `gcc` and hyphenated `gcc-7`..`gcc-16`, and FreeBSD's pkg installs `gcc14`. It has to be a real GCC (CIL's `is_bad_gcc_version` correctly rejects anything whose `--version` mentions clang, and `cc` on FreeBSD is clang). Plain `gcc` stays first, so Linux picks what it picked before |
+| 30 | `duniverse/analyzer/src/util/preprocessor.ml` | Also search the unhyphenated `cpp` prefix (`cpp14`, …) when the hyphenated one yields nothing | FreeBSD, and the same problem as 29 one layer up. `/usr/bin/cpp` on FreeBSD is clang, which goblint correctly rejects, and the `compgen -c cpp-` fallback only finds Debian-style `cpp-14`. Symptom is at **run** time, long after a clean build: `No good preprocessor (cpp) found`. `"cpp-"` is kept first and every candidate still goes through `is_good`, so Linux is unchanged. Requires a real GCC to be installed (see README's FreeBSD prerequisites) |
 
 ## Known limitations
 
