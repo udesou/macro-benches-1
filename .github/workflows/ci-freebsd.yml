@@ -191,7 +191,7 @@ jobs:
         shell: freebsd {0}
         run: |
           pkg install -y \
-            bash git gmake autoconf automake libtool m4 pkgconf zip \
+            bash git gmake gcc autoconf automake libtool m4 pkgconf zip \
             gmp mpfr openblas lapacke gsl sqlite3 libyaml perl5 \
             curl libev libevent pcre \
             ocaml-opam python3

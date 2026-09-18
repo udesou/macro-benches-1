@@ -75,7 +75,7 @@ sudo apt install build-essential autoconf automake m4 pkg-config zip python3-yam
 On FreeBSD, as root:
 
 ```sh
-pkg install autoconf automake libtool m4 pkgconf gmake zip py312-pyyaml \
+pkg install autoconf automake libtool m4 pkgconf gmake gcc zip py312-pyyaml \
             gmp mpfr openblas lapacke gsl sqlite3 libyaml perl5 \
             curl libev libevent pcre
 ```
@@ -95,9 +95,15 @@ export C_INCLUDE_PATH=/usr/local/include LIBRARY_PATH=/usr/local/lib
 
 Two differences from the apt list, both deliberate:
 
-* **No zlib, and no C toolchain.** FreeBSD ships both in the base system, so
-  there is nothing to install. `gmake` is listed separately because a few
-  vendored `configure` scripts generate GNU-only makefiles.
+* **No zlib.** FreeBSD ships it in the base system, so there is nothing to
+  install. `gmake` is listed separately because a few vendored `configure`
+  scripts generate GNU-only makefiles.
+* **`gcc` is listed even though base clang builds everything else.** goblint is
+  the exception: CIL rejects a preprocessor whose `--version` mentions clang,
+  which on FreeBSD is `/usr/bin/cpp`, so goblint needs a real GCC and its
+  `cpp14`. Without it the analysis aborts at run time with
+  `Fatal error: exception Failure("No good preprocessor (cpp) found")`, long
+  after everything has built cleanly.
 * **No PCRE2.** Neither list needs it. `conf-libpcre2-8` used to sit in
   `macro-bench-devkit.opam.template`, but nothing in the tree has ever used
   PCRE2: devkit depends on the `pcre` OCaml library (PCRE **1**, via

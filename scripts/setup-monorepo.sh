@@ -1229,6 +1229,49 @@ else
 fi
 echo ""
 
+# Patch 30: goblint's preprocessor search -- the same unhyphenated-name problem
+# as patch 29, one layer up. goblint dies at RUN time on FreeBSD with
+#   Fatal error: exception Failure("No good preprocessor (cpp) found")
+#
+# src/util/preprocessor.ml tries plain `cpp` first and rejects it when its
+# --version mentions clang/apple/darwin. On FreeBSD /usr/bin/cpp IS clang, so
+# that rejection is correct: goblint needs gcc's preprocessor semantics. It then
+# falls back to `compgen -c cpp-`, which only finds HYPHENATED names like
+# Debian's cpp-14. FreeBSD's gcc package installs cpp14, with no hyphen, so the
+# fallback matches nothing and the analysis aborts.
+#
+# Also search the unhyphenated prefix. "cpp-" is kept first so Linux picks
+# exactly what it picked before; the unhyphenated list is only consulted when
+# the hyphenated one yields nothing good, and every candidate still goes through
+# the same is_good check, so a binary that merely starts with "cpp" cannot be
+# selected unless it really is a working non-clang preprocessor.
+#
+# Requires a real GCC to be installed: see README's FreeBSD prerequisites.
+GOBLINT_CPP="duniverse/analyzer/src/util/preprocessor.ml"
+if [ -f "$GOBLINT_CPP" ]; then
+  if grep -q 'compgen "cpp"' "$GOBLINT_CPP" 2>/dev/null; then
+    echo "  [30] goblint preprocessor search: already patched."
+  else
+    python3 - "$GOBLINT_CPP" <<'PYEOF'
+import sys
+
+p = sys.argv[1]
+s = open(p).read()
+old = '      compgen "cpp-" (* only run compgen if default was bad *)\n'
+new = ('      (* FreeBSD names it cpp14, not cpp-14, so the hyphenated prefix\n'
+       '         finds nothing there. Hyphenated first: Linux is unchanged. *)\n'
+       '      (compgen "cpp-" @ compgen "cpp") (* only run compgen if default was bad *)\n')
+if s.count(old) != 1:
+    sys.exit("  [30] goblint preprocessor search: not in the expected shape")
+open(p, "w").write(s.replace(old, new, 1))
+print("  [30] goblint preprocessor search: added the unhyphenated cpp prefix.")
+PYEOF
+  fi
+else
+  echo "  [30] goblint preprocessor search: not vendored. Skipping."
+fi
+echo ""
+
 # [22] sedlex unicode.ml: stop regenerating it from a live download.
 #
 # duniverse/sedlex/src/syntax/dune has a `(mode promote)` rule that regenerates
