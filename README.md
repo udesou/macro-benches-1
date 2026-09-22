@@ -133,12 +133,33 @@ The set of scripts helps drive the benchmark runs. To know more about how to use
 
 Benchmarks can be selected by `RUNNING_TAG`:
 
+Two kinds: the input-size ladder, which picks a rung, and the runtime-feature
+tags, which pick the programs that exercise one runtime mechanism. Tags combine
+with commas (union), and the result is intersected with the config's
+`benchmarks:` block.
+
 | `RUNNING_TAG` | runs |
 |---|---|
-| *(unset)* / `default_run` | the `default` step of every tool, the standard suite |
+| *(unset)* / `default_run` | the `default` step of every tool, the standard suite (21) |
 | `small_run` / `large_run` / `huge_run` | that size across every tool (`huge_run` exists only for zarith and owl) |
-| `legacy` | the pre-ladder anchors, extra workloads, and frozen repros |
-| `all_benches` | everything at once |
+| `legacy` | the pre-ladder anchors, extra workloads, and frozen repros (30) |
+| `all_benches` | everything at once (95) |
+
+| feature tag | the mechanism, and which tools carry it |
+|---|---|
+| `weak_refs` | `Weak.Make` hash-consing: alt-ergo (theory terms), frama-c (EVA's state maps) |
+| `ephemerons` | the ephemeron *data* field (`Ephemeron.K1` with a value), which `weak_refs` does not reach: coq, through rocq's `CEphemeron` on the bytecode VM's global-slot path |
+| `effects` | `Effect.perform` and fiber switching: eio |
+| `domains` | `Domain.spawn` / `join` / `DLS`, the pinning we patch in, and so also the parallel GC: infer (the only multi-domain tool while lavyek is disabled) |
+| `marshal` | `caml_output_value` / `caml_input_value`: ocamlc (writes .cmi/.cmo), jsoo (reads a whole DATA section), coq (both, for .vo), infer (summary blobs, with closures) |
+| `compare_hash` | `compare_val` and `caml_hash` (`runtime/compare.c`, `runtime/hash.c`) under Map, Set and Hashtbl: cpdf, menhir, frama-c, goblint, ocamlformat, `devkit_network`, ocamlc |
+| `c_side_allocation` | C allocating in the OCaml heap (`Alloc_small`, `caml_alloc_shr`, `caml_modify`): coq's VM, cpdf's flate stubs |
+| `custom_blocks` | `caml_alloc_custom[_mem]` and its custom ops, *including* the `finalize` op (for a Bigarray, the runtime's `caml_ba_finalize`, which is what frees the off-heap data): zarith, owl, liq-video-frames, decompress, `devkit_gzip`, pplacer, infer |
+| `bigarrays` | `caml_ba_alloc` and Bigarray access, a subset of `custom_blocks`: owl, liq-video-frames, decompress, pplacer, ocamlc |
+| `ffi_bulk` | hot C kernels behind a thin OCaml driver: pplacer, zarith, irmin, owl, cpdf, `devkit_gzip`, `alt_ergo_unsat_smt2`, infer |
+| `off_heap_accounting` | the `mem` argument of `caml_alloc_custom_mem` against the major-GC pacer: liq-video-frames |
+| `lwt` | Lwt bind chains: irmin (coverage of the pattern; its hot path is hashing) |
+| `io_uring` / `ocaml_finalisers` | coverage gaps: no program exercises them, so a run with one of these tags aborts with "no benchmarks remain". The `cold:` and `gap:` notes in the tags block say what is close and what would close it. Note `ocaml_finalisers` is the `Gc.finalise` API alone; custom-block finalisation is covered, under `custom_blocks` |
 
 ### Build and run everything locally
 
