@@ -619,11 +619,14 @@ mirror of it: a tag exists there only if it names runtime code someone actually 
 AND selects a set no other tag already gives you. So rows here like `hashtbl`,
 `format`, `lazy` or `minor-gc` have no tag, and the 2026-09-21 trim also dropped the
 `atomics`, `mutex_condition`, `pthread_affinity`, `foreign_threads`,
-`subprocess_spawn`, `digests`, `lex_parse_engines`, `signals`, `memprof` and `kcas`
-selectors. The 14 that remain are `weak_refs`, `ephemerons`, `effects`, `domains`,
-`marshal`, `compare_hash`, `c_side_allocation`, `custom_blocks`, `bigarrays`,
-`ffi_bulk`, `off_heap_accounting`, `lwt`, and the gaps `io_uring` and
-`ocaml_finalisers`.
+`subprocess_spawn`, `digests`, `lex_parse_engines`, `signals`, `memprof`, `kcas` and
+`eio_fibers` selectors. Twelve runnable tags remain — `weak_refs`, `ephemerons`,
+`effects`, `domains`, `marshal`, `compare_hash`, `c_side_allocation`,
+`custom_blocks`, `bigarrays`, `ffi_bulk`, `off_heap_accounting`, `lwt` — and those
+twelve are what the README table lists. Two more exist but select nothing and abort
+loudly when named, which is how a gap stays discoverable: `io_uring` and
+`ocaml_finalisers`. They are deliberately absent from the README, since that table is
+a list of what you can run; this file is where they are documented.
 
 | Tag | Runtime mechanism | hot-path benchmarks | cold |
 |---|---|---|---|
@@ -953,8 +956,9 @@ handoff has a non-deterministic race that fires `Types.rev_log → Invalid -> as
 at N≥2 iterations on both 5.4.1 and d8bb46c. Full repro in
 `benchmarks/merlin/UPSTREAM_BUG.md`. When picking up: watch PR #1890, re-vendor, flip the
 programs list back on in running-ng, and re-validate (7 cram queries, ~16s at arg=4, ~1 GB
-RSS, ~24% gc_overhead). Re-enabling moves `domains`/`effects`/`atomics` tags from cold to
-exercised. Status: waiting on upstream fix.
+RSS, ~24% gc_overhead). Re-enabling moves the `domains` and `effects` tags from cold to exercised, and
+would give contended atomics a home (there is no `atomics` tag: the mechanism has no
+measurable coverage, see the matrix). Status: waiting on upstream fix.
 
 ### GC-parameter sweep on `liq_video_frames_pool` and related — filed 2026-05-01
 
