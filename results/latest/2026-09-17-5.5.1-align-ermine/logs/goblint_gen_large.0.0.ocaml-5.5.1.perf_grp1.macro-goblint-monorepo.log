@@ -1,0 +1,2661 @@
+
+-----
+mkdir -p PLOTTY_WORKAROUND; timedrun;  taskset -c 79 /home/eduardo/macro-benches/benchmarks/goblint/goblint_gen_large-ocaml-5.5.1
+running-ng v0.3.8
+Thu Sep 17 11:56:55 AM UTC 2026
+
+ 11:56:55 up 80 days,  5:03,  1 user,  load average: 0.97, 0.95, 1.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+hosking  pts/1    tmux(2549295).%0 Mon10    5:54m 38:44  38:44  claude
+
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 0  0      0 142499808 3116976 115137368    0    0     0     1    0    0  0  0 100  0  0
+ 0  0      0 142500000 3116976 115137376    0    0     0     0  306  202  0  0 100  0  0
+
+top - 11:56:57 up 80 days,  5:03,  1 user,  load average: 0.89, 0.93, 0.99
+Tasks: 909 total,   1 running, 908 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.1 us,  0.1 sy,  0.0 ni, 99.8 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem : 256773.5 total, 139160.2 free,   2130.6 used, 115482.8 buff/cache
+MiB Swap:   8192.0 total,   8192.0 free,      0.0 used. 251481.9 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+4155682 eduardo   20   0   10816   3840   2560 R  11.8   0.0   0:00.03 top -bcn 1 -w512
+3561941 hosking   20   0 6065976 451768  36480 S   5.9   0.2  38:44.46 claude
+      1 root      20   0  166428   8320   6400 S   0.0   0.0   2:26.79 /sbin/init linux
+      2 root      20   0       0      0      0 S   0.0   0.0   0:03.35 [kthreadd]
+      3 root      20   0       0      0      0 S   0.0   0.0   0:00.00 [pool_workqueue_release]
+
+Environment variables: 
+	BROWSER=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/bin/helpers/browser.sh
+	CLAUDE_CODE_SSE_PORT=48465
+	COLORTERM=truecolor
+	CONFIG_FILE=src/running/config/experiments/macro_5.5.1_align.yml
+	COPILOT_DEBUG_NONCE=50404694a3550ea125961c3610f82ed8
+	DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1218/bus
+	GIT_ASKPASS=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/extensions/git/dist/askpass.sh
+	HOME=/home/eduardo
+	LANG=en_US.UTF-8
+	LOGNAME=eduardo
+	LOG_DIR=/home/eduardo/running-ng/gc-sweep-logs-5.5.1-align-ermine-2026-09-17
+	MOTD_SHOWN=pam
+	OLDPWD=/home/eduardo/running-ng
+	OLLY_DIR=/home/eduardo/runtime_events_tools
+	PATH=/home/eduardo/.local/bin:/home/eduardo/runtime_events_tools/_build/install/default/bin:/home/eduardo/.opam/running-ng-tools/bin:/home/eduardo/.local/bin:/home/eduardo/running-ng/running-env/bin:/home/eduardo/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand:/home/eduardo/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli:/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+	PWD=/home/eduardo/running-ng
+	PYTHONPATH=/home/eduardo/running-ng/src
+	RUNNING_BENCH_DIR=/home/eduardo/macro-benches
+	RUNNING_MACRO_BENCH_DIR=/home/eduardo/macro-benches
+	RUNNING_NG_PACKAGE_DATA=/home/eduardo/running-ng/src/running/config
+	RUNNING_REUSE_SWITCHES=1
+	RUNNING_TAG=align_stress
+	SHELL=/bin/bash
+	SHLVL=4
+	SSH_CLIENT=10.0.0.2 33248 22
+	SSH_CONNECTION=10.0.0.2 33248 10.0.0.6 22
+	SSH_ORIGINAL_COMMAND=bash
+	STY=3885520.fp-benches
+	TERM=screen.xterm-256color
+	TERMCAP=SC|screen.xterm-256color|VT 100/ANSI X3.64 virtual terminal:DO=\E[%dB:LE=\E[%dD:RI=\E[%dC:UP=\E[%dA:bs:bt=\E[Z:cd=\E[J:ce=\E[K:cl=\E[H\E[J:cm=\E[%i%d;%dH:ct=\E[3g:do=^J:nd=\E[C:pt:rc=\E8:rs=\Ec:sc=\E7:st=\EH:up=\EM:le=^H:bl=^G:cr=^M:it#8:ho=\E[H:nw=\EE:ta=^I:is=\E)0:li#14:co#200:am:xn:xv:LP:sr=\EM:al=\E[L:AL=\E[%dL:cs=\E[%i%d;%dr:dl=\E[M:DL=\E[%dM:dc=\E[P:DC=\E[%dP:im=\E[4h:ei=\E[4l:mi:IC=\E[%d@:ks=\E[?1h\E=:ke=\E[?1l\E>:vi=\E[?25l:ve=\E[34h\E[?25h:vs=\E[34l:ti=\E[?1049h:te=\E[?1049l:us=\E[4m:ue=\E[24m:so=\E[3m:se=\E[23m:mb=\E[5m:md=\E[1m:mh=\E[2m:mr=\E[7m:me=\E[m:ms:Co#8:pa#64:AF=\E[3%dm:AB=\E[4%dm:op=\E[39;49m:AX:vb=\Eg:G0:as=\E(0:ae=\E(B:ac=\140\140aaffggjjkkllmmnnooppqqrrssttuuvvwwxxyyzz{{||}}~~..--++,,hhII00:po=\E[5i:pf=\E[4i:Km=\E[<:k0=\E[10~:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:k5=\E[15~:k6=\E[17~:k7=\E[18~:k8=\E[19~:k9=\E[20~:k;=\E[21~:F1=\E[23~:F2=\E[24~:kB=\E[Z:kh=\E[1~:@1=\E[1~:kH=\E[4~:@7=\E[4~:kN=\E[6~:kP=\E[5~:kI=\E[2~:kD=\E[3~:ku=\EOA:kd=\EOB:kr=\EOC:kl=\EOD:km:
+	TERM_PROGRAM=vscode
+	TERM_PROGRAM_VERSION=1.135.0
+	USER=eduardo
+	VIRTUAL_ENV=/home/eduardo/running-ng/running-env
+	VSCODE_GIT_ASKPASS_EXTRA_ARGS=
+	VSCODE_GIT_ASKPASS_MAIN=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/extensions/git/dist/askpass-main.js
+	VSCODE_GIT_ASKPASS_NODE=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/node
+	VSCODE_GIT_IPC_HANDLE=/run/user/1218/vscode-git-b79068f4db.sock
+	VSCODE_IPC_HOOK_CLI=/run/user/1218/vscode-ipc-8f0f799c-1b5b-4118-ac50-4ffca798b483.sock
+	VSCODE_PYTHON_AUTOACTIVATE_GUARD=1
+	WINDOW=0
+	XDG_RUNTIME_DIR=/run/user/1218
+	XDG_SESSION_CLASS=user
+	XDG_SESSION_ID=15956
+	XDG_SESSION_TYPE=tty
+	_=/home/eduardo/running-ng/running-env/bin/python3
+OS: Linux ermine 6.8.0-90-generic #91~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Nov 21 07:37:59 UTC 2 aarch64 aarch64 aarch64 GNU/Linux
+CPU: Neoverse-N1
+number of cores: 80
+Frequency of cpu 0: 3.00 GHz
+Governor of cpu 0: performance
+Scaling_min_freq of cpu 0: 1.00 GHz
+Frequency of cpu 1: 3.00 GHz
+Governor of cpu 1: performance
+Scaling_min_freq of cpu 1: 1.00 GHz
+Frequency of cpu 2: 3.00 GHz
+Governor of cpu 2: performance
+Scaling_min_freq of cpu 2: 1.00 GHz
+Frequency of cpu 3: 3.00 GHz
+Governor of cpu 3: performance
+Scaling_min_freq of cpu 3: 1.00 GHz
+Frequency of cpu 4: 3.00 GHz
+Governor of cpu 4: performance
+Scaling_min_freq of cpu 4: 1.00 GHz
+Frequency of cpu 5: 3.00 GHz
+Governor of cpu 5: performance
+Scaling_min_freq of cpu 5: 1.00 GHz
+Frequency of cpu 6: 3.00 GHz
+Governor of cpu 6: performance
+Scaling_min_freq of cpu 6: 1.00 GHz
+Frequency of cpu 7: 3.00 GHz
+Governor of cpu 7: performance
+Scaling_min_freq of cpu 7: 1.00 GHz
+Frequency of cpu 8: 3.00 GHz
+Governor of cpu 8: performance
+Scaling_min_freq of cpu 8: 1.00 GHz
+Frequency of cpu 9: 3.00 GHz
+Governor of cpu 9: performance
+Scaling_min_freq of cpu 9: 1.00 GHz
+Frequency of cpu 10: 3.00 GHz
+Governor of cpu 10: performance
+Scaling_min_freq of cpu 10: 1.00 GHz
+Frequency of cpu 11: 3.00 GHz
+Governor of cpu 11: performance
+Scaling_min_freq of cpu 11: 1.00 GHz
+Frequency of cpu 12: 3.00 GHz
+Governor of cpu 12: performance
+Scaling_min_freq of cpu 12: 1.00 GHz
+Frequency of cpu 13: 3.00 GHz
+Governor of cpu 13: performance
+Scaling_min_freq of cpu 13: 1.00 GHz
+Frequency of cpu 14: 3.00 GHz
+Governor of cpu 14: performance
+Scaling_min_freq of cpu 14: 1.00 GHz
+Frequency of cpu 15: 3.00 GHz
+Governor of cpu 15: performance
+Scaling_min_freq of cpu 15: 1.00 GHz
+Frequency of cpu 16: 3.00 GHz
+Governor of cpu 16: performance
+Scaling_min_freq of cpu 16: 1.00 GHz
+Frequency of cpu 17: 3.00 GHz
+Governor of cpu 17: performance
+Scaling_min_freq of cpu 17: 1.00 GHz
+Frequency of cpu 18: 3.00 GHz
+Governor of cpu 18: performance
+Scaling_min_freq of cpu 18: 1.00 GHz
+Frequency of cpu 19: 3.00 GHz
+Governor of cpu 19: performance
+Scaling_min_freq of cpu 19: 1.00 GHz
+Frequency of cpu 20: 3.00 GHz
+Governor of cpu 20: performance
+Scaling_min_freq of cpu 20: 1.00 GHz
+Frequency of cpu 21: 3.00 GHz
+Governor of cpu 21: performance
+Scaling_min_freq of cpu 21: 1.00 GHz
+Frequency of cpu 22: 3.00 GHz
+Governor of cpu 22: performance
+Scaling_min_freq of cpu 22: 1.00 GHz
+Frequency of cpu 23: 3.00 GHz
+Governor of cpu 23: performance
+Scaling_min_freq of cpu 23: 1.00 GHz
+Frequency of cpu 24: 3.00 GHz
+Governor of cpu 24: performance
+Scaling_min_freq of cpu 24: 1.00 GHz
+Frequency of cpu 25: 3.00 GHz
+Governor of cpu 25: performance
+Scaling_min_freq of cpu 25: 1.00 GHz
+Frequency of cpu 26: 3.00 GHz
+Governor of cpu 26: performance
+Scaling_min_freq of cpu 26: 1.00 GHz
+Frequency of cpu 27: 3.00 GHz
+Governor of cpu 27: performance
+Scaling_min_freq of cpu 27: 1.00 GHz
+Frequency of cpu 28: 3.00 GHz
+Governor of cpu 28: performance
+Scaling_min_freq of cpu 28: 1.00 GHz
+Frequency of cpu 29: 3.00 GHz
+Governor of cpu 29: performance
+Scaling_min_freq of cpu 29: 1.00 GHz
+Frequency of cpu 30: 3.00 GHz
+Governor of cpu 30: performance
+Scaling_min_freq of cpu 30: 1.00 GHz
+Frequency of cpu 31: 3.00 GHz
+Governor of cpu 31: performance
+Scaling_min_freq of cpu 31: 1.00 GHz
+Frequency of cpu 32: 3.00 GHz
+Governor of cpu 32: performance
+Scaling_min_freq of cpu 32: 1.00 GHz
+Frequency of cpu 33: 3.00 GHz
+Governor of cpu 33: performance
+Scaling_min_freq of cpu 33: 1.00 GHz
+Frequency of cpu 34: 3.00 GHz
+Governor of cpu 34: performance
+Scaling_min_freq of cpu 34: 1.00 GHz
+Frequency of cpu 35: 3.00 GHz
+Governor of cpu 35: performance
+Scaling_min_freq of cpu 35: 1.00 GHz
+Frequency of cpu 36: 3.00 GHz
+Governor of cpu 36: performance
+Scaling_min_freq of cpu 36: 1.00 GHz
+Frequency of cpu 37: 3.00 GHz
+Governor of cpu 37: performance
+Scaling_min_freq of cpu 37: 1.00 GHz
+Frequency of cpu 38: 3.00 GHz
+Governor of cpu 38: performance
+Scaling_min_freq of cpu 38: 1.00 GHz
+Frequency of cpu 39: 3.00 GHz
+Governor of cpu 39: performance
+Scaling_min_freq of cpu 39: 1.00 GHz
+Frequency of cpu 40: 3.00 GHz
+Governor of cpu 40: performance
+Scaling_min_freq of cpu 40: 1.00 GHz
+Frequency of cpu 41: 3.00 GHz
+Governor of cpu 41: performance
+Scaling_min_freq of cpu 41: 1.00 GHz
+Frequency of cpu 42: 3.00 GHz
+Governor of cpu 42: performance
+Scaling_min_freq of cpu 42: 1.00 GHz
+Frequency of cpu 43: 3.00 GHz
+Governor of cpu 43: performance
+Scaling_min_freq of cpu 43: 1.00 GHz
+Frequency of cpu 44: 3.00 GHz
+Governor of cpu 44: performance
+Scaling_min_freq of cpu 44: 1.00 GHz
+Frequency of cpu 45: 3.00 GHz
+Governor of cpu 45: performance
+Scaling_min_freq of cpu 45: 1.00 GHz
+Frequency of cpu 46: 3.00 GHz
+Governor of cpu 46: performance
+Scaling_min_freq of cpu 46: 1.00 GHz
+Frequency of cpu 47: 3.00 GHz
+Governor of cpu 47: performance
+Scaling_min_freq of cpu 47: 1.00 GHz
+Frequency of cpu 48: 3.00 GHz
+Governor of cpu 48: performance
+Scaling_min_freq of cpu 48: 1.00 GHz
+Frequency of cpu 49: 3.00 GHz
+Governor of cpu 49: performance
+Scaling_min_freq of cpu 49: 1.00 GHz
+Frequency of cpu 50: 3.00 GHz
+Governor of cpu 50: performance
+Scaling_min_freq of cpu 50: 1.00 GHz
+Frequency of cpu 51: 3.00 GHz
+Governor of cpu 51: performance
+Scaling_min_freq of cpu 51: 1.00 GHz
+Frequency of cpu 52: 3.00 GHz
+Governor of cpu 52: performance
+Scaling_min_freq of cpu 52: 1.00 GHz
+Frequency of cpu 53: 3.00 GHz
+Governor of cpu 53: performance
+Scaling_min_freq of cpu 53: 1.00 GHz
+Frequency of cpu 54: 3.00 GHz
+Governor of cpu 54: performance
+Scaling_min_freq of cpu 54: 1.00 GHz
+Frequency of cpu 55: 3.00 GHz
+Governor of cpu 55: performance
+Scaling_min_freq of cpu 55: 1.00 GHz
+Frequency of cpu 56: 3.00 GHz
+Governor of cpu 56: performance
+Scaling_min_freq of cpu 56: 1.00 GHz
+Frequency of cpu 57: 3.00 GHz
+Governor of cpu 57: performance
+Scaling_min_freq of cpu 57: 1.00 GHz
+Frequency of cpu 58: 3.00 GHz
+Governor of cpu 58: performance
+Scaling_min_freq of cpu 58: 1.00 GHz
+Frequency of cpu 59: 3.00 GHz
+Governor of cpu 59: performance
+Scaling_min_freq of cpu 59: 1.00 GHz
+Frequency of cpu 60: 3.00 GHz
+Governor of cpu 60: performance
+Scaling_min_freq of cpu 60: 1.00 GHz
+Frequency of cpu 61: 3.00 GHz
+Governor of cpu 61: performance
+Scaling_min_freq of cpu 61: 1.00 GHz
+Frequency of cpu 62: 3.00 GHz
+Governor of cpu 62: performance
+Scaling_min_freq of cpu 62: 1.00 GHz
+Frequency of cpu 63: 3.00 GHz
+Governor of cpu 63: performance
+Scaling_min_freq of cpu 63: 1.00 GHz
+Frequency of cpu 64: 3.00 GHz
+Governor of cpu 64: performance
+Scaling_min_freq of cpu 64: 1.00 GHz
+Frequency of cpu 65: 3.00 GHz
+Governor of cpu 65: performance
+Scaling_min_freq of cpu 65: 1.00 GHz
+Frequency of cpu 66: 3.00 GHz
+Governor of cpu 66: performance
+Scaling_min_freq of cpu 66: 1.00 GHz
+Frequency of cpu 67: 3.00 GHz
+Governor of cpu 67: performance
+Scaling_min_freq of cpu 67: 1.00 GHz
+Frequency of cpu 68: 3.00 GHz
+Governor of cpu 68: performance
+Scaling_min_freq of cpu 68: 1.00 GHz
+Frequency of cpu 69: 3.00 GHz
+Governor of cpu 69: performance
+Scaling_min_freq of cpu 69: 1.00 GHz
+Frequency of cpu 70: 3.00 GHz
+Governor of cpu 70: performance
+Scaling_min_freq of cpu 70: 1.00 GHz
+Frequency of cpu 71: 3.00 GHz
+Governor of cpu 71: performance
+Scaling_min_freq of cpu 71: 1.00 GHz
+Frequency of cpu 72: 3.00 GHz
+Governor of cpu 72: performance
+Scaling_min_freq of cpu 72: 1.00 GHz
+Frequency of cpu 73: 3.00 GHz
+Governor of cpu 73: performance
+Scaling_min_freq of cpu 73: 1.00 GHz
+Frequency of cpu 74: 3.00 GHz
+Governor of cpu 74: performance
+Scaling_min_freq of cpu 74: 1.00 GHz
+Frequency of cpu 75: 3.00 GHz
+Governor of cpu 75: performance
+Scaling_min_freq of cpu 75: 1.00 GHz
+Frequency of cpu 76: 3.00 GHz
+Governor of cpu 76: performance
+Scaling_min_freq of cpu 76: 1.00 GHz
+Frequency of cpu 77: 3.00 GHz
+Governor of cpu 77: performance
+Scaling_min_freq of cpu 77: 1.00 GHz
+Frequency of cpu 78: 3.00 GHz
+Governor of cpu 78: performance
+Scaling_min_freq of cpu 78: 1.00 GHz
+Frequency of cpu 79: 3.00 GHz
+Governor of cpu 79: performance
+Scaling_min_freq of cpu 79: 1.00 GHz
+[0;33m[Warning] --sets is deprecated, use --set instead.[0;0;00m
+[0;33m[Warning] --sets is deprecated, use --set instead.[0;0;00m
+[Error] Machine definition not available for selected architecture, defaulting to host
+[Info] unrolling loop at /home/eduardo/macro-benches/benchmarks/goblint/goblint_gen_large.c:9:3-859:3 with factor 4
+[Info] SV-COMP specification: CHECK( init(main()), LTL(G ! call(reach_error())) )
+
+[Info] runtime: 00:00:10.551
+[Info] vars: 6054, evals: 5487
+
+[Info] |called|=3405
+
+Memory statistics: total=28136.21MB, max=72.79MB, minor=28131.90MB, major=252.28MB, promoted=247.97MB
+    minor collections=13426  major collections=23 compactions=0
+
+
+[Info] runtime: 00:00:20.571
+[Info] vars: 6214, evals: 5567
+
+[Info] |called|=2084
+
+Memory statistics: total=56715.92MB, max=86.65MB, minor=56711.54MB, major=514.01MB, promoted=509.63MB
+    minor collections=27060  major collections=35 compactions=0
+
+
+[Info] runtime: 00:00:30.600
+[Info] vars: 6374, evals: 5647
+
+[Info] |called|=761
+
+Memory statistics: total=85314.50MB, max=102.38MB, minor=85310.07MB, major=776.28MB, promoted=771.85MB
+    minor collections=40702  major collections=45 compactions=0
+
+
+[Info] runtime: 00:00:40.621
+[Info] vars: 7862, evals: 8224
+
+[Info] |called|=257
+
+Memory statistics: total=112703.01MB, max=118.11MB, minor=112698.54MB, major=1044.52MB, promoted=1040.06MB
+    minor collections=53766  major collections=53 compactions=0
+
+
+[Info] runtime: 00:00:50.654
+[Info] vars: 7862, evals: 9473
+
+[Info] |called|=43
+
+Memory statistics: total=141623.47MB, max=136.98MB, minor=141618.99MB, major=1302.92MB, promoted=1298.44MB
+    minor collections=67560  major collections=60 compactions=0
+
+
+[Info] runtime: 00:01:00.674
+[Info] vars: 7862, evals: 11891
+
+[Info] |called|=1093
+
+Memory statistics: total=170662.40MB, max=143.57MB, minor=170657.92MB, major=1565.74MB, promoted=1561.26MB
+    minor collections=81410  major collections=66 compactions=0
+
+
+[Info] runtime: 00:01:10.688
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=198643.46MB, max=149.47MB, minor=198638.83MB, major=1822.23MB, promoted=1817.59MB
+    minor collections=94756  major collections=73 compactions=0
+
+
+[Info] runtime: 00:01:20.700
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=227366.77MB, max=155.33MB, minor=227362.13MB, major=2041.58MB, promoted=2036.93MB
+    minor collections=108455  major collections=78 compactions=0
+
+
+[Info] runtime: 00:01:30.706
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=255887.73MB, max=155.33MB, minor=255883.06MB, major=2294.81MB, promoted=2290.14MB
+    minor collections=122058  major collections=84 compactions=0
+
+
+[Info] runtime: 00:01:40.712
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=283318.13MB, max=155.33MB, minor=283313.48MB, major=2547.37MB, promoted=2542.71MB
+    minor collections=135141  major collections=90 compactions=0
+
+
+[Info] runtime: 00:01:50.713
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=312445.60MB, max=155.33MB, minor=312440.50MB, major=2798.98MB, promoted=2793.87MB
+    minor collections=149033  major collections=96 compactions=0
+
+*****
+{
+  "rusage": {
+    "user_time": 111.817,
+    "system_time": 0.312,
+    "minor_faults": 50381,
+    "major_faults": 1,
+    "voluntary_ctx_switches": 36,
+    "involuntary_ctx_switches": 343
+  },
+  "olly": {
+    "version": 1,
+    "wall_time": 112.09,
+    "cpu_time": 112.09,
+    "gc_time": 8.44,
+    "gc_overhead": 7.53,
+    "max_rss_kb": 188528,
+    "domain_stats": {
+      "0": {
+        "wall_time": 112.09,
+        "gc_time": 8.44,
+        "gc_overhead": 7.53
+      }
+    },
+    "mean_latency": 0.027993,
+    "stddev_latency": 0.065293,
+    "min_latency": 0.0,
+    "max_latency": 6.414335,
+    "distr_latency": {
+      "25.0000": 0.007687,
+      "50.0000": 0.013487,
+      "60.0000": 0.017215,
+      "70.0000": 0.023935,
+      "75.0000": 0.030767,
+      "80.0000": 0.049695,
+      "85.0000": 0.061343,
+      "90.0000": 0.067775,
+      "95.0000": 0.092735,
+      "96.0000": 0.099263,
+      "97.0000": 0.106495,
+      "98.0000": 0.115455,
+      "99.0000": 0.136831,
+      "99.9000": 0.499711,
+      "99.9900": 3.418111,
+      "99.9990": 5.079039,
+      "99.9999": 6.414335,
+      "100.0000": 6.414335
+    },
+    "allocations": {
+      "total_heap": 39512001661,
+      "minor_heap": 39511319190,
+      "major_heap": 352243882,
+      "promoted_words": 351561411,
+      "promoted_pct": 0.89
+    },
+    "domain_alloc_stats": {
+      "0": {
+        "total": 39512001661,
+        "minor": 39511319190,
+        "promoted": 351561411,
+        "major": 352243882,
+        "promoted_pct": 0.89
+      }
+    },
+    "collections": {
+      "minor": 150774,
+      "major": 97,
+      "forced_major": 0,
+      "compactions": 0
+    }
+  },
+  "counter_backend": "linux-perf",
+  "perf": [
+    {
+      "counter-value": "112110.541720",
+      "unit": "msec",
+      "event": "task-clock",
+      "event-runtime": 112110541720,
+      "pcnt-running": 100.0,
+      "metric-value": "0.991118",
+      "metric-unit": "CPUs utilized"
+    },
+    {
+      "counter-value": "49259.000000",
+      "unit": "",
+      "event": "page-faults",
+      "event-runtime": 112110541720,
+      "pcnt-running": 100.0,
+      "metric-value": "439.378842",
+      "metric-unit": "/sec"
+    },
+    {
+      "counter-value": "336324192089.000000",
+      "unit": "",
+      "event": "cycles",
+      "event-runtime": 112110541720,
+      "pcnt-running": 100.0,
+      "metric-value": "2.999934",
+      "metric-unit": "GHz"
+    },
+    {
+      "counter-value": "752753624803.000000",
+      "unit": "",
+      "event": "instructions",
+      "event-runtime": 112110541720,
+      "pcnt-running": 100.0,
+      "metric-value": "2.238179",
+      "metric-unit": "insn per cycle"
+    }
+  ]
+}
+-----
+mkdir -p PLOTTY_WORKAROUND; timedrun;  taskset -c 79 /home/eduardo/macro-benches/benchmarks/goblint/goblint_gen_large-ocaml-5.5.1
+running-ng v0.3.8
+Thu Sep 17 12:10:24 PM UTC 2026
+
+ 12:10:24 up 80 days,  5:17,  1 user,  load average: 0.99, 0.99, 1.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+hosking  pts/1    tmux(2549295).%0 Mon10    6:08m 38:51  38:51  claude
+
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 0  0      0 142491520 3116976 115139520    0    0     0     1    0    0  0  0 100  0  0
+ 1  0      0 142491520 3116976 115139520    0    0     0     0  411  362  0  0 100  0  0
+
+top - 12:10:25 up 80 days,  5:17,  1 user,  load average: 0.99, 0.99, 1.00
+Tasks: 908 total,   1 running, 907 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.1 us,  0.2 sy,  0.0 ni, 99.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem : 256773.5 total, 139152.3 free,   2136.6 used, 115484.6 buff/cache
+MiB Swap:   8192.0 total,   8192.0 free,      0.0 used. 251476.0 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+3561941 hosking   20   0 6065976 453504  37760 S   5.9   0.2  38:51.41 claude
+4156016 eduardo   20   0   10816   3840   2560 R   5.9   0.0   0:00.02 top -bcn 1 -w512
+      1 root      20   0  166428   8320   6400 S   0.0   0.0   2:26.79 /sbin/init linux
+      2 root      20   0       0      0      0 S   0.0   0.0   0:03.35 [kthreadd]
+      3 root      20   0       0      0      0 S   0.0   0.0   0:00.00 [pool_workqueue_release]
+
+Environment variables: 
+	BROWSER=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/bin/helpers/browser.sh
+	CLAUDE_CODE_SSE_PORT=48465
+	COLORTERM=truecolor
+	CONFIG_FILE=src/running/config/experiments/macro_5.5.1_align.yml
+	COPILOT_DEBUG_NONCE=50404694a3550ea125961c3610f82ed8
+	DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1218/bus
+	GIT_ASKPASS=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/extensions/git/dist/askpass.sh
+	HOME=/home/eduardo
+	LANG=en_US.UTF-8
+	LOGNAME=eduardo
+	LOG_DIR=/home/eduardo/running-ng/gc-sweep-logs-5.5.1-align-ermine-2026-09-17
+	MOTD_SHOWN=pam
+	OLDPWD=/home/eduardo/running-ng
+	OLLY_DIR=/home/eduardo/runtime_events_tools
+	PATH=/home/eduardo/.local/bin:/home/eduardo/runtime_events_tools/_build/install/default/bin:/home/eduardo/.opam/running-ng-tools/bin:/home/eduardo/.local/bin:/home/eduardo/running-ng/running-env/bin:/home/eduardo/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand:/home/eduardo/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli:/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+	PWD=/home/eduardo/running-ng
+	PYTHONPATH=/home/eduardo/running-ng/src
+	RUNNING_BENCH_DIR=/home/eduardo/macro-benches
+	RUNNING_MACRO_BENCH_DIR=/home/eduardo/macro-benches
+	RUNNING_NG_PACKAGE_DATA=/home/eduardo/running-ng/src/running/config
+	RUNNING_REUSE_SWITCHES=1
+	RUNNING_TAG=align_stress
+	SHELL=/bin/bash
+	SHLVL=4
+	SSH_CLIENT=10.0.0.2 33248 22
+	SSH_CONNECTION=10.0.0.2 33248 10.0.0.6 22
+	SSH_ORIGINAL_COMMAND=bash
+	STY=3885520.fp-benches
+	TERM=screen.xterm-256color
+	TERMCAP=SC|screen.xterm-256color|VT 100/ANSI X3.64 virtual terminal:DO=\E[%dB:LE=\E[%dD:RI=\E[%dC:UP=\E[%dA:bs:bt=\E[Z:cd=\E[J:ce=\E[K:cl=\E[H\E[J:cm=\E[%i%d;%dH:ct=\E[3g:do=^J:nd=\E[C:pt:rc=\E8:rs=\Ec:sc=\E7:st=\EH:up=\EM:le=^H:bl=^G:cr=^M:it#8:ho=\E[H:nw=\EE:ta=^I:is=\E)0:li#14:co#200:am:xn:xv:LP:sr=\EM:al=\E[L:AL=\E[%dL:cs=\E[%i%d;%dr:dl=\E[M:DL=\E[%dM:dc=\E[P:DC=\E[%dP:im=\E[4h:ei=\E[4l:mi:IC=\E[%d@:ks=\E[?1h\E=:ke=\E[?1l\E>:vi=\E[?25l:ve=\E[34h\E[?25h:vs=\E[34l:ti=\E[?1049h:te=\E[?1049l:us=\E[4m:ue=\E[24m:so=\E[3m:se=\E[23m:mb=\E[5m:md=\E[1m:mh=\E[2m:mr=\E[7m:me=\E[m:ms:Co#8:pa#64:AF=\E[3%dm:AB=\E[4%dm:op=\E[39;49m:AX:vb=\Eg:G0:as=\E(0:ae=\E(B:ac=\140\140aaffggjjkkllmmnnooppqqrrssttuuvvwwxxyyzz{{||}}~~..--++,,hhII00:po=\E[5i:pf=\E[4i:Km=\E[<:k0=\E[10~:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:k5=\E[15~:k6=\E[17~:k7=\E[18~:k8=\E[19~:k9=\E[20~:k;=\E[21~:F1=\E[23~:F2=\E[24~:kB=\E[Z:kh=\E[1~:@1=\E[1~:kH=\E[4~:@7=\E[4~:kN=\E[6~:kP=\E[5~:kI=\E[2~:kD=\E[3~:ku=\EOA:kd=\EOB:kr=\EOC:kl=\EOD:km:
+	TERM_PROGRAM=vscode
+	TERM_PROGRAM_VERSION=1.135.0
+	USER=eduardo
+	VIRTUAL_ENV=/home/eduardo/running-ng/running-env
+	VSCODE_GIT_ASKPASS_EXTRA_ARGS=
+	VSCODE_GIT_ASKPASS_MAIN=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/extensions/git/dist/askpass-main.js
+	VSCODE_GIT_ASKPASS_NODE=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/node
+	VSCODE_GIT_IPC_HANDLE=/run/user/1218/vscode-git-b79068f4db.sock
+	VSCODE_IPC_HOOK_CLI=/run/user/1218/vscode-ipc-8f0f799c-1b5b-4118-ac50-4ffca798b483.sock
+	VSCODE_PYTHON_AUTOACTIVATE_GUARD=1
+	WINDOW=0
+	XDG_RUNTIME_DIR=/run/user/1218
+	XDG_SESSION_CLASS=user
+	XDG_SESSION_ID=15956
+	XDG_SESSION_TYPE=tty
+	_=/home/eduardo/running-ng/running-env/bin/python3
+OS: Linux ermine 6.8.0-90-generic #91~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Nov 21 07:37:59 UTC 2 aarch64 aarch64 aarch64 GNU/Linux
+CPU: Neoverse-N1
+number of cores: 80
+Frequency of cpu 0: 3.00 GHz
+Governor of cpu 0: performance
+Scaling_min_freq of cpu 0: 1.00 GHz
+Frequency of cpu 1: 3.00 GHz
+Governor of cpu 1: performance
+Scaling_min_freq of cpu 1: 1.00 GHz
+Frequency of cpu 2: 3.00 GHz
+Governor of cpu 2: performance
+Scaling_min_freq of cpu 2: 1.00 GHz
+Frequency of cpu 3: 3.00 GHz
+Governor of cpu 3: performance
+Scaling_min_freq of cpu 3: 1.00 GHz
+Frequency of cpu 4: 3.00 GHz
+Governor of cpu 4: performance
+Scaling_min_freq of cpu 4: 1.00 GHz
+Frequency of cpu 5: 3.00 GHz
+Governor of cpu 5: performance
+Scaling_min_freq of cpu 5: 1.00 GHz
+Frequency of cpu 6: 3.00 GHz
+Governor of cpu 6: performance
+Scaling_min_freq of cpu 6: 1.00 GHz
+Frequency of cpu 7: 3.00 GHz
+Governor of cpu 7: performance
+Scaling_min_freq of cpu 7: 1.00 GHz
+Frequency of cpu 8: 3.00 GHz
+Governor of cpu 8: performance
+Scaling_min_freq of cpu 8: 1.00 GHz
+Frequency of cpu 9: 3.00 GHz
+Governor of cpu 9: performance
+Scaling_min_freq of cpu 9: 1.00 GHz
+Frequency of cpu 10: 3.00 GHz
+Governor of cpu 10: performance
+Scaling_min_freq of cpu 10: 1.00 GHz
+Frequency of cpu 11: 3.00 GHz
+Governor of cpu 11: performance
+Scaling_min_freq of cpu 11: 1.00 GHz
+Frequency of cpu 12: 3.00 GHz
+Governor of cpu 12: performance
+Scaling_min_freq of cpu 12: 1.00 GHz
+Frequency of cpu 13: 3.00 GHz
+Governor of cpu 13: performance
+Scaling_min_freq of cpu 13: 1.00 GHz
+Frequency of cpu 14: 3.00 GHz
+Governor of cpu 14: performance
+Scaling_min_freq of cpu 14: 1.00 GHz
+Frequency of cpu 15: 3.00 GHz
+Governor of cpu 15: performance
+Scaling_min_freq of cpu 15: 1.00 GHz
+Frequency of cpu 16: 3.00 GHz
+Governor of cpu 16: performance
+Scaling_min_freq of cpu 16: 1.00 GHz
+Frequency of cpu 17: 3.00 GHz
+Governor of cpu 17: performance
+Scaling_min_freq of cpu 17: 1.00 GHz
+Frequency of cpu 18: 3.00 GHz
+Governor of cpu 18: performance
+Scaling_min_freq of cpu 18: 1.00 GHz
+Frequency of cpu 19: 3.00 GHz
+Governor of cpu 19: performance
+Scaling_min_freq of cpu 19: 1.00 GHz
+Frequency of cpu 20: 3.00 GHz
+Governor of cpu 20: performance
+Scaling_min_freq of cpu 20: 1.00 GHz
+Frequency of cpu 21: 3.00 GHz
+Governor of cpu 21: performance
+Scaling_min_freq of cpu 21: 1.00 GHz
+Frequency of cpu 22: 3.00 GHz
+Governor of cpu 22: performance
+Scaling_min_freq of cpu 22: 1.00 GHz
+Frequency of cpu 23: 3.00 GHz
+Governor of cpu 23: performance
+Scaling_min_freq of cpu 23: 1.00 GHz
+Frequency of cpu 24: 3.00 GHz
+Governor of cpu 24: performance
+Scaling_min_freq of cpu 24: 1.00 GHz
+Frequency of cpu 25: 3.00 GHz
+Governor of cpu 25: performance
+Scaling_min_freq of cpu 25: 1.00 GHz
+Frequency of cpu 26: 3.00 GHz
+Governor of cpu 26: performance
+Scaling_min_freq of cpu 26: 1.00 GHz
+Frequency of cpu 27: 3.00 GHz
+Governor of cpu 27: performance
+Scaling_min_freq of cpu 27: 1.00 GHz
+Frequency of cpu 28: 3.00 GHz
+Governor of cpu 28: performance
+Scaling_min_freq of cpu 28: 1.00 GHz
+Frequency of cpu 29: 3.00 GHz
+Governor of cpu 29: performance
+Scaling_min_freq of cpu 29: 1.00 GHz
+Frequency of cpu 30: 3.00 GHz
+Governor of cpu 30: performance
+Scaling_min_freq of cpu 30: 1.00 GHz
+Frequency of cpu 31: 3.00 GHz
+Governor of cpu 31: performance
+Scaling_min_freq of cpu 31: 1.00 GHz
+Frequency of cpu 32: 3.00 GHz
+Governor of cpu 32: performance
+Scaling_min_freq of cpu 32: 1.00 GHz
+Frequency of cpu 33: 3.00 GHz
+Governor of cpu 33: performance
+Scaling_min_freq of cpu 33: 1.00 GHz
+Frequency of cpu 34: 3.00 GHz
+Governor of cpu 34: performance
+Scaling_min_freq of cpu 34: 1.00 GHz
+Frequency of cpu 35: 3.00 GHz
+Governor of cpu 35: performance
+Scaling_min_freq of cpu 35: 1.00 GHz
+Frequency of cpu 36: 3.00 GHz
+Governor of cpu 36: performance
+Scaling_min_freq of cpu 36: 1.00 GHz
+Frequency of cpu 37: 3.00 GHz
+Governor of cpu 37: performance
+Scaling_min_freq of cpu 37: 1.00 GHz
+Frequency of cpu 38: 3.00 GHz
+Governor of cpu 38: performance
+Scaling_min_freq of cpu 38: 1.00 GHz
+Frequency of cpu 39: 3.00 GHz
+Governor of cpu 39: performance
+Scaling_min_freq of cpu 39: 1.00 GHz
+Frequency of cpu 40: 3.00 GHz
+Governor of cpu 40: performance
+Scaling_min_freq of cpu 40: 1.00 GHz
+Frequency of cpu 41: 3.00 GHz
+Governor of cpu 41: performance
+Scaling_min_freq of cpu 41: 1.00 GHz
+Frequency of cpu 42: 3.00 GHz
+Governor of cpu 42: performance
+Scaling_min_freq of cpu 42: 1.00 GHz
+Frequency of cpu 43: 3.00 GHz
+Governor of cpu 43: performance
+Scaling_min_freq of cpu 43: 1.00 GHz
+Frequency of cpu 44: 3.00 GHz
+Governor of cpu 44: performance
+Scaling_min_freq of cpu 44: 1.00 GHz
+Frequency of cpu 45: 3.00 GHz
+Governor of cpu 45: performance
+Scaling_min_freq of cpu 45: 1.00 GHz
+Frequency of cpu 46: 3.00 GHz
+Governor of cpu 46: performance
+Scaling_min_freq of cpu 46: 1.00 GHz
+Frequency of cpu 47: 3.00 GHz
+Governor of cpu 47: performance
+Scaling_min_freq of cpu 47: 1.00 GHz
+Frequency of cpu 48: 3.00 GHz
+Governor of cpu 48: performance
+Scaling_min_freq of cpu 48: 1.00 GHz
+Frequency of cpu 49: 3.00 GHz
+Governor of cpu 49: performance
+Scaling_min_freq of cpu 49: 1.00 GHz
+Frequency of cpu 50: 3.00 GHz
+Governor of cpu 50: performance
+Scaling_min_freq of cpu 50: 1.00 GHz
+Frequency of cpu 51: 3.00 GHz
+Governor of cpu 51: performance
+Scaling_min_freq of cpu 51: 1.00 GHz
+Frequency of cpu 52: 3.00 GHz
+Governor of cpu 52: performance
+Scaling_min_freq of cpu 52: 1.00 GHz
+Frequency of cpu 53: 3.00 GHz
+Governor of cpu 53: performance
+Scaling_min_freq of cpu 53: 1.00 GHz
+Frequency of cpu 54: 3.00 GHz
+Governor of cpu 54: performance
+Scaling_min_freq of cpu 54: 1.00 GHz
+Frequency of cpu 55: 3.00 GHz
+Governor of cpu 55: performance
+Scaling_min_freq of cpu 55: 1.00 GHz
+Frequency of cpu 56: 3.00 GHz
+Governor of cpu 56: performance
+Scaling_min_freq of cpu 56: 1.00 GHz
+Frequency of cpu 57: 3.00 GHz
+Governor of cpu 57: performance
+Scaling_min_freq of cpu 57: 1.00 GHz
+Frequency of cpu 58: 3.00 GHz
+Governor of cpu 58: performance
+Scaling_min_freq of cpu 58: 1.00 GHz
+Frequency of cpu 59: 3.00 GHz
+Governor of cpu 59: performance
+Scaling_min_freq of cpu 59: 1.00 GHz
+Frequency of cpu 60: 3.00 GHz
+Governor of cpu 60: performance
+Scaling_min_freq of cpu 60: 1.00 GHz
+Frequency of cpu 61: 3.00 GHz
+Governor of cpu 61: performance
+Scaling_min_freq of cpu 61: 1.00 GHz
+Frequency of cpu 62: 3.00 GHz
+Governor of cpu 62: performance
+Scaling_min_freq of cpu 62: 1.00 GHz
+Frequency of cpu 63: 3.00 GHz
+Governor of cpu 63: performance
+Scaling_min_freq of cpu 63: 1.00 GHz
+Frequency of cpu 64: 3.00 GHz
+Governor of cpu 64: performance
+Scaling_min_freq of cpu 64: 1.00 GHz
+Frequency of cpu 65: 3.00 GHz
+Governor of cpu 65: performance
+Scaling_min_freq of cpu 65: 1.00 GHz
+Frequency of cpu 66: 3.00 GHz
+Governor of cpu 66: performance
+Scaling_min_freq of cpu 66: 1.00 GHz
+Frequency of cpu 67: 3.00 GHz
+Governor of cpu 67: performance
+Scaling_min_freq of cpu 67: 1.00 GHz
+Frequency of cpu 68: 3.00 GHz
+Governor of cpu 68: performance
+Scaling_min_freq of cpu 68: 1.00 GHz
+Frequency of cpu 69: 3.00 GHz
+Governor of cpu 69: performance
+Scaling_min_freq of cpu 69: 1.00 GHz
+Frequency of cpu 70: 3.00 GHz
+Governor of cpu 70: performance
+Scaling_min_freq of cpu 70: 1.00 GHz
+Frequency of cpu 71: 3.00 GHz
+Governor of cpu 71: performance
+Scaling_min_freq of cpu 71: 1.00 GHz
+Frequency of cpu 72: 3.00 GHz
+Governor of cpu 72: performance
+Scaling_min_freq of cpu 72: 1.00 GHz
+Frequency of cpu 73: 3.00 GHz
+Governor of cpu 73: performance
+Scaling_min_freq of cpu 73: 1.00 GHz
+Frequency of cpu 74: 3.00 GHz
+Governor of cpu 74: performance
+Scaling_min_freq of cpu 74: 1.00 GHz
+Frequency of cpu 75: 3.00 GHz
+Governor of cpu 75: performance
+Scaling_min_freq of cpu 75: 1.00 GHz
+Frequency of cpu 76: 3.00 GHz
+Governor of cpu 76: performance
+Scaling_min_freq of cpu 76: 1.00 GHz
+Frequency of cpu 77: 3.00 GHz
+Governor of cpu 77: performance
+Scaling_min_freq of cpu 77: 1.00 GHz
+Frequency of cpu 78: 3.00 GHz
+Governor of cpu 78: performance
+Scaling_min_freq of cpu 78: 1.00 GHz
+Frequency of cpu 79: 3.00 GHz
+Governor of cpu 79: performance
+Scaling_min_freq of cpu 79: 1.00 GHz
+[0;33m[Warning] --sets is deprecated, use --set instead.[0;0;00m
+[0;33m[Warning] --sets is deprecated, use --set instead.[0;0;00m
+[Error] Machine definition not available for selected architecture, defaulting to host
+[Info] unrolling loop at /home/eduardo/macro-benches/benchmarks/goblint/goblint_gen_large.c:9:3-859:3 with factor 4
+[Info] SV-COMP specification: CHECK( init(main()), LTL(G ! call(reach_error())) )
+
+[Info] runtime: 00:00:10.547
+[Info] vars: 6054, evals: 5487
+
+[Info] |called|=3441
+
+Memory statistics: total=26969.18MB, max=72.75MB, minor=26964.84MB, major=242.01MB, promoted=237.68MB
+    minor collections=12869  major collections=22 compactions=0
+
+
+[Info] runtime: 00:00:20.573
+[Info] vars: 6214, evals: 5567
+
+[Info] |called|=2160
+
+Memory statistics: total=54277.99MB, max=86.71MB, minor=54273.63MB, major=492.21MB, promoted=487.86MB
+    minor collections=25897  major collections=34 compactions=0
+
+
+[Info] runtime: 00:00:30.592
+[Info] vars: 6374, evals: 5647
+
+[Info] |called|=879
+
+Memory statistics: total=81574.28MB, max=102.44MB, minor=81569.84MB, major=742.67MB, promoted=738.23MB
+    minor collections=38918  major collections=44 compactions=0
+
+
+[Info] runtime: 00:00:40.617
+[Info] vars: 7782, evals: 8144
+
+[Info] |called|=781
+
+Memory statistics: total=108633.53MB, max=118.10MB, minor=108629.08MB, major=992.57MB, promoted=988.11MB
+    minor collections=51825  major collections=52 compactions=0
+
+
+[Info] runtime: 00:00:50.649
+[Info] vars: 7862, evals: 9393
+
+[Info] |called|=657
+
+Memory statistics: total=135738.92MB, max=136.73MB, minor=135734.45MB, major=1245.06MB, promoted=1240.60MB
+    minor collections=64753  major collections=58 compactions=0
+
+
+[Info] runtime: 00:01:00.670
+[Info] vars: 7862, evals: 10722
+
+[Info] |called|=120
+
+Memory statistics: total=162440.61MB, max=143.76MB, minor=162436.12MB, major=1501.26MB, promoted=1496.77MB
+    minor collections=77489  major collections=65 compactions=0
+
+
+[Info] runtime: 00:01:10.675
+[Info] vars: 7862, evals: 11971
+
+[Info] |called|=28
+
+Memory statistics: total=190483.33MB, max=143.78MB, minor=190478.91MB, major=1750.61MB, promoted=1746.20MB
+    minor collections=90864  major collections=71 compactions=0
+
+
+[Info] runtime: 00:01:20.702
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=217262.81MB, max=155.39MB, minor=217258.17MB, major=1951.69MB, promoted=1947.04MB
+    minor collections=103636  major collections=76 compactions=0
+
+
+[Info] runtime: 00:01:30.704
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=244424.83MB, max=155.39MB, minor=244420.16MB, major=2192.73MB, promoted=2188.06MB
+    minor collections=116591  major collections=82 compactions=0
+
+
+[Info] runtime: 00:01:40.707
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=271636.11MB, max=155.39MB, minor=271631.44MB, major=2434.04MB, promoted=2429.37MB
+    minor collections=129569  major collections=87 compactions=0
+
+
+[Info] runtime: 00:01:50.710
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=298987.94MB, max=155.39MB, minor=298983.23MB, major=2678.19MB, promoted=2673.48MB
+    minor collections=142615  major collections=94 compactions=0
+
+*****
+{
+  "rusage": {
+    "user_time": 116.91,
+    "system_time": 0.309,
+    "minor_faults": 50387,
+    "major_faults": 1,
+    "voluntary_ctx_switches": 35,
+    "involuntary_ctx_switches": 370
+  },
+  "olly": {
+    "version": 1,
+    "wall_time": 117.18,
+    "cpu_time": 117.18,
+    "gc_time": 8.44,
+    "gc_overhead": 7.2,
+    "max_rss_kb": 188524,
+    "domain_stats": {
+      "0": {
+        "wall_time": 117.18,
+        "gc_time": 8.44,
+        "gc_overhead": 7.2
+      }
+    },
+    "mean_latency": 0.027999,
+    "stddev_latency": 0.065425,
+    "min_latency": 0.0,
+    "max_latency": 6.533119,
+    "distr_latency": {
+      "25.0000": 0.007607,
+      "50.0000": 0.013327,
+      "60.0000": 0.017199,
+      "70.0000": 0.023935,
+      "75.0000": 0.030927,
+      "80.0000": 0.049983,
+      "85.0000": 0.061663,
+      "90.0000": 0.068095,
+      "95.0000": 0.092927,
+      "96.0000": 0.099455,
+      "97.0000": 0.106623,
+      "98.0000": 0.116159,
+      "99.0000": 0.138239,
+      "99.9000": 0.488447,
+      "99.9900": 3.385343,
+      "99.9990": 5.160959,
+      "99.9999": 6.533119,
+      "100.0000": 6.533119
+    },
+    "allocations": {
+      "total_heap": 39512001159,
+      "minor_heap": 39511318688,
+      "major_heap": 352148907,
+      "promoted_words": 351466436,
+      "promoted_pct": 0.89
+    },
+    "domain_alloc_stats": {
+      "0": {
+        "total": 39512001159,
+        "minor": 39511318688,
+        "promoted": 351466436,
+        "major": 352148907,
+        "promoted_pct": 0.89
+      }
+    },
+    "collections": {
+      "minor": 150774,
+      "major": 97,
+      "forced_major": 0,
+      "compactions": 0
+    }
+  },
+  "counter_backend": "linux-perf",
+  "perf": [
+    {
+      "counter-value": "117201.617120",
+      "unit": "msec",
+      "event": "task-clock",
+      "event-runtime": 117201617120,
+      "pcnt-running": 100.0,
+      "metric-value": "0.992241",
+      "metric-unit": "CPUs utilized"
+    },
+    {
+      "counter-value": "49266.000000",
+      "unit": "",
+      "event": "page-faults",
+      "event-runtime": 117201617120,
+      "pcnt-running": 100.0,
+      "metric-value": "420.352562",
+      "metric-unit": "/sec"
+    },
+    {
+      "counter-value": "351597333513.000000",
+      "unit": "",
+      "event": "cycles",
+      "event-runtime": 117201617120,
+      "pcnt-running": 100.0,
+      "metric-value": "2.999936",
+      "metric-unit": "GHz"
+    },
+    {
+      "counter-value": "752757476548.000000",
+      "unit": "",
+      "event": "instructions",
+      "event-runtime": 117201617120,
+      "pcnt-running": 100.0,
+      "metric-value": "2.140965",
+      "metric-unit": "insn per cycle"
+    }
+  ]
+}
+-----
+mkdir -p PLOTTY_WORKAROUND; timedrun;  taskset -c 79 /home/eduardo/macro-benches/benchmarks/goblint/goblint_gen_large-ocaml-5.5.1
+running-ng v0.3.8
+Thu Sep 17 12:23:49 PM UTC 2026
+
+ 12:23:49 up 80 days,  5:30,  1 user,  load average: 0.99, 1.00, 1.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+hosking  pts/1    tmux(2549295).%0 Mon10    6:21m 38:58  38:58  claude
+
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 0  0      0 142492832 3116976 115139608    0    0     0     1    0    0  0  0 100  0  0
+ 0  0      0 142492832 3116976 115139608    0    0     0     0  534  375  0  0 100  0  0
+
+top - 12:23:50 up 80 days,  5:30,  1 user,  load average: 0.99, 1.00, 1.00
+Tasks: 908 total,   1 running, 907 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.1 us,  0.1 sy,  0.0 ni, 99.8 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem : 256773.5 total, 139153.2 free,   2135.4 used, 115484.9 buff/cache
+MiB Swap:   8192.0 total,   8192.0 free,      0.0 used. 251477.1 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+4156348 eduardo   20   0   10816   3840   2560 R   5.9   0.0   0:00.02 top -bcn 1 -w512
+      1 root      20   0  166428   8320   6400 S   0.0   0.0   2:26.80 /sbin/init linux
+      2 root      20   0       0      0      0 S   0.0   0.0   0:03.35 [kthreadd]
+      3 root      20   0       0      0      0 S   0.0   0.0   0:00.00 [pool_workqueue_release]
+      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 [kworker/R-rcu_g]
+
+Environment variables: 
+	BROWSER=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/bin/helpers/browser.sh
+	CLAUDE_CODE_SSE_PORT=48465
+	COLORTERM=truecolor
+	CONFIG_FILE=src/running/config/experiments/macro_5.5.1_align.yml
+	COPILOT_DEBUG_NONCE=50404694a3550ea125961c3610f82ed8
+	DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1218/bus
+	GIT_ASKPASS=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/extensions/git/dist/askpass.sh
+	HOME=/home/eduardo
+	LANG=en_US.UTF-8
+	LOGNAME=eduardo
+	LOG_DIR=/home/eduardo/running-ng/gc-sweep-logs-5.5.1-align-ermine-2026-09-17
+	MOTD_SHOWN=pam
+	OLDPWD=/home/eduardo/running-ng
+	OLLY_DIR=/home/eduardo/runtime_events_tools
+	PATH=/home/eduardo/.local/bin:/home/eduardo/runtime_events_tools/_build/install/default/bin:/home/eduardo/.opam/running-ng-tools/bin:/home/eduardo/.local/bin:/home/eduardo/running-ng/running-env/bin:/home/eduardo/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand:/home/eduardo/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli:/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+	PWD=/home/eduardo/running-ng
+	PYTHONPATH=/home/eduardo/running-ng/src
+	RUNNING_BENCH_DIR=/home/eduardo/macro-benches
+	RUNNING_MACRO_BENCH_DIR=/home/eduardo/macro-benches
+	RUNNING_NG_PACKAGE_DATA=/home/eduardo/running-ng/src/running/config
+	RUNNING_REUSE_SWITCHES=1
+	RUNNING_TAG=align_stress
+	SHELL=/bin/bash
+	SHLVL=4
+	SSH_CLIENT=10.0.0.2 33248 22
+	SSH_CONNECTION=10.0.0.2 33248 10.0.0.6 22
+	SSH_ORIGINAL_COMMAND=bash
+	STY=3885520.fp-benches
+	TERM=screen.xterm-256color
+	TERMCAP=SC|screen.xterm-256color|VT 100/ANSI X3.64 virtual terminal:DO=\E[%dB:LE=\E[%dD:RI=\E[%dC:UP=\E[%dA:bs:bt=\E[Z:cd=\E[J:ce=\E[K:cl=\E[H\E[J:cm=\E[%i%d;%dH:ct=\E[3g:do=^J:nd=\E[C:pt:rc=\E8:rs=\Ec:sc=\E7:st=\EH:up=\EM:le=^H:bl=^G:cr=^M:it#8:ho=\E[H:nw=\EE:ta=^I:is=\E)0:li#14:co#200:am:xn:xv:LP:sr=\EM:al=\E[L:AL=\E[%dL:cs=\E[%i%d;%dr:dl=\E[M:DL=\E[%dM:dc=\E[P:DC=\E[%dP:im=\E[4h:ei=\E[4l:mi:IC=\E[%d@:ks=\E[?1h\E=:ke=\E[?1l\E>:vi=\E[?25l:ve=\E[34h\E[?25h:vs=\E[34l:ti=\E[?1049h:te=\E[?1049l:us=\E[4m:ue=\E[24m:so=\E[3m:se=\E[23m:mb=\E[5m:md=\E[1m:mh=\E[2m:mr=\E[7m:me=\E[m:ms:Co#8:pa#64:AF=\E[3%dm:AB=\E[4%dm:op=\E[39;49m:AX:vb=\Eg:G0:as=\E(0:ae=\E(B:ac=\140\140aaffggjjkkllmmnnooppqqrrssttuuvvwwxxyyzz{{||}}~~..--++,,hhII00:po=\E[5i:pf=\E[4i:Km=\E[<:k0=\E[10~:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:k5=\E[15~:k6=\E[17~:k7=\E[18~:k8=\E[19~:k9=\E[20~:k;=\E[21~:F1=\E[23~:F2=\E[24~:kB=\E[Z:kh=\E[1~:@1=\E[1~:kH=\E[4~:@7=\E[4~:kN=\E[6~:kP=\E[5~:kI=\E[2~:kD=\E[3~:ku=\EOA:kd=\EOB:kr=\EOC:kl=\EOD:km:
+	TERM_PROGRAM=vscode
+	TERM_PROGRAM_VERSION=1.135.0
+	USER=eduardo
+	VIRTUAL_ENV=/home/eduardo/running-ng/running-env
+	VSCODE_GIT_ASKPASS_EXTRA_ARGS=
+	VSCODE_GIT_ASKPASS_MAIN=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/extensions/git/dist/askpass-main.js
+	VSCODE_GIT_ASKPASS_NODE=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/node
+	VSCODE_GIT_IPC_HANDLE=/run/user/1218/vscode-git-b79068f4db.sock
+	VSCODE_IPC_HOOK_CLI=/run/user/1218/vscode-ipc-8f0f799c-1b5b-4118-ac50-4ffca798b483.sock
+	VSCODE_PYTHON_AUTOACTIVATE_GUARD=1
+	WINDOW=0
+	XDG_RUNTIME_DIR=/run/user/1218
+	XDG_SESSION_CLASS=user
+	XDG_SESSION_ID=15956
+	XDG_SESSION_TYPE=tty
+	_=/home/eduardo/running-ng/running-env/bin/python3
+OS: Linux ermine 6.8.0-90-generic #91~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Nov 21 07:37:59 UTC 2 aarch64 aarch64 aarch64 GNU/Linux
+CPU: Neoverse-N1
+number of cores: 80
+Frequency of cpu 0: 3.00 GHz
+Governor of cpu 0: performance
+Scaling_min_freq of cpu 0: 1.00 GHz
+Frequency of cpu 1: 3.00 GHz
+Governor of cpu 1: performance
+Scaling_min_freq of cpu 1: 1.00 GHz
+Frequency of cpu 2: 3.00 GHz
+Governor of cpu 2: performance
+Scaling_min_freq of cpu 2: 1.00 GHz
+Frequency of cpu 3: 3.00 GHz
+Governor of cpu 3: performance
+Scaling_min_freq of cpu 3: 1.00 GHz
+Frequency of cpu 4: 3.00 GHz
+Governor of cpu 4: performance
+Scaling_min_freq of cpu 4: 1.00 GHz
+Frequency of cpu 5: 3.00 GHz
+Governor of cpu 5: performance
+Scaling_min_freq of cpu 5: 1.00 GHz
+Frequency of cpu 6: 3.00 GHz
+Governor of cpu 6: performance
+Scaling_min_freq of cpu 6: 1.00 GHz
+Frequency of cpu 7: 3.00 GHz
+Governor of cpu 7: performance
+Scaling_min_freq of cpu 7: 1.00 GHz
+Frequency of cpu 8: 3.00 GHz
+Governor of cpu 8: performance
+Scaling_min_freq of cpu 8: 1.00 GHz
+Frequency of cpu 9: 3.00 GHz
+Governor of cpu 9: performance
+Scaling_min_freq of cpu 9: 1.00 GHz
+Frequency of cpu 10: 3.00 GHz
+Governor of cpu 10: performance
+Scaling_min_freq of cpu 10: 1.00 GHz
+Frequency of cpu 11: 3.00 GHz
+Governor of cpu 11: performance
+Scaling_min_freq of cpu 11: 1.00 GHz
+Frequency of cpu 12: 3.00 GHz
+Governor of cpu 12: performance
+Scaling_min_freq of cpu 12: 1.00 GHz
+Frequency of cpu 13: 3.00 GHz
+Governor of cpu 13: performance
+Scaling_min_freq of cpu 13: 1.00 GHz
+Frequency of cpu 14: 3.00 GHz
+Governor of cpu 14: performance
+Scaling_min_freq of cpu 14: 1.00 GHz
+Frequency of cpu 15: 3.00 GHz
+Governor of cpu 15: performance
+Scaling_min_freq of cpu 15: 1.00 GHz
+Frequency of cpu 16: 3.00 GHz
+Governor of cpu 16: performance
+Scaling_min_freq of cpu 16: 1.00 GHz
+Frequency of cpu 17: 3.00 GHz
+Governor of cpu 17: performance
+Scaling_min_freq of cpu 17: 1.00 GHz
+Frequency of cpu 18: 3.00 GHz
+Governor of cpu 18: performance
+Scaling_min_freq of cpu 18: 1.00 GHz
+Frequency of cpu 19: 3.00 GHz
+Governor of cpu 19: performance
+Scaling_min_freq of cpu 19: 1.00 GHz
+Frequency of cpu 20: 3.00 GHz
+Governor of cpu 20: performance
+Scaling_min_freq of cpu 20: 1.00 GHz
+Frequency of cpu 21: 3.00 GHz
+Governor of cpu 21: performance
+Scaling_min_freq of cpu 21: 1.00 GHz
+Frequency of cpu 22: 3.00 GHz
+Governor of cpu 22: performance
+Scaling_min_freq of cpu 22: 1.00 GHz
+Frequency of cpu 23: 3.00 GHz
+Governor of cpu 23: performance
+Scaling_min_freq of cpu 23: 1.00 GHz
+Frequency of cpu 24: 3.00 GHz
+Governor of cpu 24: performance
+Scaling_min_freq of cpu 24: 1.00 GHz
+Frequency of cpu 25: 3.00 GHz
+Governor of cpu 25: performance
+Scaling_min_freq of cpu 25: 1.00 GHz
+Frequency of cpu 26: 3.00 GHz
+Governor of cpu 26: performance
+Scaling_min_freq of cpu 26: 1.00 GHz
+Frequency of cpu 27: 3.00 GHz
+Governor of cpu 27: performance
+Scaling_min_freq of cpu 27: 1.00 GHz
+Frequency of cpu 28: 3.00 GHz
+Governor of cpu 28: performance
+Scaling_min_freq of cpu 28: 1.00 GHz
+Frequency of cpu 29: 3.00 GHz
+Governor of cpu 29: performance
+Scaling_min_freq of cpu 29: 1.00 GHz
+Frequency of cpu 30: 3.00 GHz
+Governor of cpu 30: performance
+Scaling_min_freq of cpu 30: 1.00 GHz
+Frequency of cpu 31: 3.00 GHz
+Governor of cpu 31: performance
+Scaling_min_freq of cpu 31: 1.00 GHz
+Frequency of cpu 32: 3.00 GHz
+Governor of cpu 32: performance
+Scaling_min_freq of cpu 32: 1.00 GHz
+Frequency of cpu 33: 3.00 GHz
+Governor of cpu 33: performance
+Scaling_min_freq of cpu 33: 1.00 GHz
+Frequency of cpu 34: 3.00 GHz
+Governor of cpu 34: performance
+Scaling_min_freq of cpu 34: 1.00 GHz
+Frequency of cpu 35: 3.00 GHz
+Governor of cpu 35: performance
+Scaling_min_freq of cpu 35: 1.00 GHz
+Frequency of cpu 36: 3.00 GHz
+Governor of cpu 36: performance
+Scaling_min_freq of cpu 36: 1.00 GHz
+Frequency of cpu 37: 3.00 GHz
+Governor of cpu 37: performance
+Scaling_min_freq of cpu 37: 1.00 GHz
+Frequency of cpu 38: 3.00 GHz
+Governor of cpu 38: performance
+Scaling_min_freq of cpu 38: 1.00 GHz
+Frequency of cpu 39: 3.00 GHz
+Governor of cpu 39: performance
+Scaling_min_freq of cpu 39: 1.00 GHz
+Frequency of cpu 40: 3.00 GHz
+Governor of cpu 40: performance
+Scaling_min_freq of cpu 40: 1.00 GHz
+Frequency of cpu 41: 3.00 GHz
+Governor of cpu 41: performance
+Scaling_min_freq of cpu 41: 1.00 GHz
+Frequency of cpu 42: 3.00 GHz
+Governor of cpu 42: performance
+Scaling_min_freq of cpu 42: 1.00 GHz
+Frequency of cpu 43: 3.00 GHz
+Governor of cpu 43: performance
+Scaling_min_freq of cpu 43: 1.00 GHz
+Frequency of cpu 44: 3.00 GHz
+Governor of cpu 44: performance
+Scaling_min_freq of cpu 44: 1.00 GHz
+Frequency of cpu 45: 3.00 GHz
+Governor of cpu 45: performance
+Scaling_min_freq of cpu 45: 1.00 GHz
+Frequency of cpu 46: 3.00 GHz
+Governor of cpu 46: performance
+Scaling_min_freq of cpu 46: 1.00 GHz
+Frequency of cpu 47: 3.00 GHz
+Governor of cpu 47: performance
+Scaling_min_freq of cpu 47: 1.00 GHz
+Frequency of cpu 48: 3.00 GHz
+Governor of cpu 48: performance
+Scaling_min_freq of cpu 48: 1.00 GHz
+Frequency of cpu 49: 3.00 GHz
+Governor of cpu 49: performance
+Scaling_min_freq of cpu 49: 1.00 GHz
+Frequency of cpu 50: 3.00 GHz
+Governor of cpu 50: performance
+Scaling_min_freq of cpu 50: 1.00 GHz
+Frequency of cpu 51: 3.00 GHz
+Governor of cpu 51: performance
+Scaling_min_freq of cpu 51: 1.00 GHz
+Frequency of cpu 52: 3.00 GHz
+Governor of cpu 52: performance
+Scaling_min_freq of cpu 52: 1.00 GHz
+Frequency of cpu 53: 3.00 GHz
+Governor of cpu 53: performance
+Scaling_min_freq of cpu 53: 1.00 GHz
+Frequency of cpu 54: 3.00 GHz
+Governor of cpu 54: performance
+Scaling_min_freq of cpu 54: 1.00 GHz
+Frequency of cpu 55: 3.00 GHz
+Governor of cpu 55: performance
+Scaling_min_freq of cpu 55: 1.00 GHz
+Frequency of cpu 56: 3.00 GHz
+Governor of cpu 56: performance
+Scaling_min_freq of cpu 56: 1.00 GHz
+Frequency of cpu 57: 3.00 GHz
+Governor of cpu 57: performance
+Scaling_min_freq of cpu 57: 1.00 GHz
+Frequency of cpu 58: 3.00 GHz
+Governor of cpu 58: performance
+Scaling_min_freq of cpu 58: 1.00 GHz
+Frequency of cpu 59: 3.00 GHz
+Governor of cpu 59: performance
+Scaling_min_freq of cpu 59: 1.00 GHz
+Frequency of cpu 60: 3.00 GHz
+Governor of cpu 60: performance
+Scaling_min_freq of cpu 60: 1.00 GHz
+Frequency of cpu 61: 3.00 GHz
+Governor of cpu 61: performance
+Scaling_min_freq of cpu 61: 1.00 GHz
+Frequency of cpu 62: 3.00 GHz
+Governor of cpu 62: performance
+Scaling_min_freq of cpu 62: 1.00 GHz
+Frequency of cpu 63: 3.00 GHz
+Governor of cpu 63: performance
+Scaling_min_freq of cpu 63: 1.00 GHz
+Frequency of cpu 64: 3.00 GHz
+Governor of cpu 64: performance
+Scaling_min_freq of cpu 64: 1.00 GHz
+Frequency of cpu 65: 3.00 GHz
+Governor of cpu 65: performance
+Scaling_min_freq of cpu 65: 1.00 GHz
+Frequency of cpu 66: 3.00 GHz
+Governor of cpu 66: performance
+Scaling_min_freq of cpu 66: 1.00 GHz
+Frequency of cpu 67: 3.00 GHz
+Governor of cpu 67: performance
+Scaling_min_freq of cpu 67: 1.00 GHz
+Frequency of cpu 68: 3.00 GHz
+Governor of cpu 68: performance
+Scaling_min_freq of cpu 68: 1.00 GHz
+Frequency of cpu 69: 3.00 GHz
+Governor of cpu 69: performance
+Scaling_min_freq of cpu 69: 1.00 GHz
+Frequency of cpu 70: 3.00 GHz
+Governor of cpu 70: performance
+Scaling_min_freq of cpu 70: 1.00 GHz
+Frequency of cpu 71: 3.00 GHz
+Governor of cpu 71: performance
+Scaling_min_freq of cpu 71: 1.00 GHz
+Frequency of cpu 72: 3.00 GHz
+Governor of cpu 72: performance
+Scaling_min_freq of cpu 72: 1.00 GHz
+Frequency of cpu 73: 3.00 GHz
+Governor of cpu 73: performance
+Scaling_min_freq of cpu 73: 1.00 GHz
+Frequency of cpu 74: 3.00 GHz
+Governor of cpu 74: performance
+Scaling_min_freq of cpu 74: 1.00 GHz
+Frequency of cpu 75: 3.00 GHz
+Governor of cpu 75: performance
+Scaling_min_freq of cpu 75: 1.00 GHz
+Frequency of cpu 76: 3.00 GHz
+Governor of cpu 76: performance
+Scaling_min_freq of cpu 76: 1.00 GHz
+Frequency of cpu 77: 3.00 GHz
+Governor of cpu 77: performance
+Scaling_min_freq of cpu 77: 1.00 GHz
+Frequency of cpu 78: 3.00 GHz
+Governor of cpu 78: performance
+Scaling_min_freq of cpu 78: 1.00 GHz
+Frequency of cpu 79: 3.00 GHz
+Governor of cpu 79: performance
+Scaling_min_freq of cpu 79: 1.00 GHz
+[0;33m[Warning] --sets is deprecated, use --set instead.[0;0;00m
+[0;33m[Warning] --sets is deprecated, use --set instead.[0;0;00m
+[Error] Machine definition not available for selected architecture, defaulting to host
+[Info] unrolling loop at /home/eduardo/macro-benches/benchmarks/goblint/goblint_gen_large.c:9:3-859:3 with factor 4
+[Info] SV-COMP specification: CHECK( init(main()), LTL(G ! call(reach_error())) )
+
+[Info] runtime: 00:00:10.539
+[Info] vars: 6054, evals: 5487
+
+[Info] |called|=3441
+
+Memory statistics: total=26952.41MB, max=72.75MB, minor=26948.07MB, major=241.95MB, promoted=237.61MB
+    minor collections=12861  major collections=22 compactions=0
+
+
+[Info] runtime: 00:00:20.565
+[Info] vars: 6214, evals: 5567
+
+[Info] |called|=2159
+
+Memory statistics: total=54292.64MB, max=86.61MB, minor=54288.31MB, major=492.50MB, promoted=488.17MB
+    minor collections=25904  major collections=34 compactions=0
+
+
+[Info] runtime: 00:00:30.589
+[Info] vars: 6374, evals: 5647
+
+[Info] |called|=877
+
+Memory statistics: total=81620.40MB, max=102.41MB, minor=81615.98MB, major=743.22MB, promoted=738.79MB
+    minor collections=38940  major collections=44 compactions=0
+
+
+[Info] runtime: 00:00:40.610
+[Info] vars: 7782, evals: 8144
+
+[Info] |called|=779
+
+Memory statistics: total=108717.38MB, max=117.93MB, minor=108712.96MB, major=993.32MB, promoted=988.90MB
+    minor collections=51865  major collections=52 compactions=0
+
+
+[Info] runtime: 00:00:50.638
+[Info] vars: 7862, evals: 9393
+
+[Info] |called|=648
+
+Memory statistics: total=135797.63MB, max=136.83MB, minor=135793.16MB, major=1246.56MB, promoted=1242.09MB
+    minor collections=64781  major collections=58 compactions=0
+
+
+[Info] runtime: 00:01:00.652
+[Info] vars: 7862, evals: 10722
+
+[Info] |called|=116
+
+Memory statistics: total=162553.84MB, max=143.66MB, minor=162549.36MB, major=1502.11MB, promoted=1497.63MB
+    minor collections=77543  major collections=65 compactions=0
+
+
+[Info] runtime: 00:01:10.656
+[Info] vars: 7862, evals: 11971
+
+[Info] |called|=27
+
+Memory statistics: total=190560.99MB, max=143.67MB, minor=190556.50MB, major=1751.31MB, promoted=1746.82MB
+    minor collections=90901  major collections=71 compactions=0
+
+
+[Info] runtime: 00:01:20.682
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=217329.90MB, max=155.79MB, minor=217325.26MB, major=1952.70MB, promoted=1948.06MB
+    minor collections=103668  major collections=76 compactions=0
+
+
+[Info] runtime: 00:01:30.683
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=244546.42MB, max=155.79MB, minor=244541.78MB, major=2194.67MB, promoted=2190.02MB
+    minor collections=116649  major collections=82 compactions=0
+
+
+[Info] runtime: 00:01:40.686
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=271769.27MB, max=155.79MB, minor=271764.60MB, major=2436.23MB, promoted=2431.56MB
+    minor collections=129633  major collections=88 compactions=0
+
+
+[Info] runtime: 00:01:50.687
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=299120.05MB, max=155.79MB, minor=299115.34MB, major=2680.17MB, promoted=2675.46MB
+    minor collections=142678  major collections=94 compactions=0
+
+*****
+{
+  "rusage": {
+    "user_time": 116.87,
+    "system_time": 0.288,
+    "minor_faults": 50496,
+    "major_faults": 1,
+    "voluntary_ctx_switches": 36,
+    "involuntary_ctx_switches": 323
+  },
+  "olly": {
+    "version": 1,
+    "wall_time": 117.12,
+    "cpu_time": 117.12,
+    "gc_time": 8.44,
+    "gc_overhead": 7.21,
+    "max_rss_kb": 188528,
+    "domain_stats": {
+      "0": {
+        "wall_time": 117.12,
+        "gc_time": 8.44,
+        "gc_overhead": 7.21
+      }
+    },
+    "mean_latency": 0.028006,
+    "stddev_latency": 0.065214,
+    "min_latency": 0.0,
+    "max_latency": 6.606847,
+    "distr_latency": {
+      "25.0000": 0.007567,
+      "50.0000": 0.013367,
+      "60.0000": 0.017295,
+      "70.0000": 0.023967,
+      "75.0000": 0.030847,
+      "80.0000": 0.049919,
+      "85.0000": 0.061727,
+      "90.0000": 0.068095,
+      "95.0000": 0.092863,
+      "96.0000": 0.099327,
+      "97.0000": 0.106559,
+      "98.0000": 0.115839,
+      "99.0000": 0.137471,
+      "99.9000": 0.512511,
+      "99.9900": 3.414015,
+      "99.9990": 5.087231,
+      "99.9999": 6.606847,
+      "100.0000": 6.606847
+    },
+    "allocations": {
+      "total_heap": 39511999289,
+      "minor_heap": 39511316818,
+      "major_heap": 352407662,
+      "promoted_words": 351725191,
+      "promoted_pct": 0.89
+    },
+    "domain_alloc_stats": {
+      "0": {
+        "total": 39511999289,
+        "minor": 39511316818,
+        "promoted": 351725191,
+        "major": 352407662,
+        "promoted_pct": 0.89
+      }
+    },
+    "collections": {
+      "minor": 150774,
+      "major": 97,
+      "forced_major": 0,
+      "compactions": 0
+    }
+  },
+  "counter_backend": "linux-perf",
+  "perf": [
+    {
+      "counter-value": "117140.718840",
+      "unit": "msec",
+      "event": "task-clock",
+      "event-runtime": 117140718840,
+      "pcnt-running": 100.0,
+      "metric-value": "0.991717",
+      "metric-unit": "CPUs utilized"
+    },
+    {
+      "counter-value": "49375.000000",
+      "unit": "",
+      "event": "page-faults",
+      "event-runtime": 117140718840,
+      "pcnt-running": 100.0,
+      "metric-value": "421.501596",
+      "metric-unit": "/sec"
+    },
+    {
+      "counter-value": "351415104920.000000",
+      "unit": "",
+      "event": "cycles",
+      "event-runtime": 117140718840,
+      "pcnt-running": 100.0,
+      "metric-value": "2.999940",
+      "metric-unit": "GHz"
+    },
+    {
+      "counter-value": "752779655975.000000",
+      "unit": "",
+      "event": "instructions",
+      "event-runtime": 117140718840,
+      "pcnt-running": 100.0,
+      "metric-value": "2.142138",
+      "metric-unit": "insn per cycle"
+    }
+  ]
+}
+-----
+mkdir -p PLOTTY_WORKAROUND; timedrun;  taskset -c 79 /home/eduardo/macro-benches/benchmarks/goblint/goblint_gen_large-ocaml-5.5.1
+running-ng v0.3.8
+Thu Sep 17 12:37:12 PM UTC 2026
+
+ 12:37:12 up 80 days,  5:43,  1 user,  load average: 0.95, 0.99, 0.99
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+hosking  pts/1    tmux(2549295).%0 Mon10    6:35m 39:06  39:06  claude
+
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 0  0      0 142496656 3117000 115138248    0    0     0     1    0    0  0  0 100  0  0
+ 0  0      0 142496656 3117000 115138248    0    0     0     0  417  368  0  0 100  0  0
+
+top - 12:37:13 up 80 days,  5:43,  1 user,  load average: 0.95, 0.99, 0.99
+Tasks: 909 total,   1 running, 908 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.1 us,  0.1 sy,  0.0 ni, 99.8 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem : 256773.5 total, 139156.9 free,   2133.0 used, 115483.6 buff/cache
+MiB Swap:   8192.0 total,   8192.0 free,      0.0 used. 251479.5 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+3561941 hosking   20   0 6065976 451076  35840 S   5.9   0.2  39:06.63 claude
+4156679 eduardo   20   0   10816   3840   2560 R   5.9   0.0   0:00.02 top -bcn 1 -w512
+      1 root      20   0  166428   8320   6400 S   0.0   0.0   2:26.80 /sbin/init linux
+      2 root      20   0       0      0      0 S   0.0   0.0   0:03.35 [kthreadd]
+      3 root      20   0       0      0      0 S   0.0   0.0   0:00.00 [pool_workqueue_release]
+
+Environment variables: 
+	BROWSER=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/bin/helpers/browser.sh
+	CLAUDE_CODE_SSE_PORT=48465
+	COLORTERM=truecolor
+	CONFIG_FILE=src/running/config/experiments/macro_5.5.1_align.yml
+	COPILOT_DEBUG_NONCE=50404694a3550ea125961c3610f82ed8
+	DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1218/bus
+	GIT_ASKPASS=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/extensions/git/dist/askpass.sh
+	HOME=/home/eduardo
+	LANG=en_US.UTF-8
+	LOGNAME=eduardo
+	LOG_DIR=/home/eduardo/running-ng/gc-sweep-logs-5.5.1-align-ermine-2026-09-17
+	MOTD_SHOWN=pam
+	OLDPWD=/home/eduardo/running-ng
+	OLLY_DIR=/home/eduardo/runtime_events_tools
+	PATH=/home/eduardo/.local/bin:/home/eduardo/runtime_events_tools/_build/install/default/bin:/home/eduardo/.opam/running-ng-tools/bin:/home/eduardo/.local/bin:/home/eduardo/running-ng/running-env/bin:/home/eduardo/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand:/home/eduardo/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli:/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+	PWD=/home/eduardo/running-ng
+	PYTHONPATH=/home/eduardo/running-ng/src
+	RUNNING_BENCH_DIR=/home/eduardo/macro-benches
+	RUNNING_MACRO_BENCH_DIR=/home/eduardo/macro-benches
+	RUNNING_NG_PACKAGE_DATA=/home/eduardo/running-ng/src/running/config
+	RUNNING_REUSE_SWITCHES=1
+	RUNNING_TAG=align_stress
+	SHELL=/bin/bash
+	SHLVL=4
+	SSH_CLIENT=10.0.0.2 33248 22
+	SSH_CONNECTION=10.0.0.2 33248 10.0.0.6 22
+	SSH_ORIGINAL_COMMAND=bash
+	STY=3885520.fp-benches
+	TERM=screen.xterm-256color
+	TERMCAP=SC|screen.xterm-256color|VT 100/ANSI X3.64 virtual terminal:DO=\E[%dB:LE=\E[%dD:RI=\E[%dC:UP=\E[%dA:bs:bt=\E[Z:cd=\E[J:ce=\E[K:cl=\E[H\E[J:cm=\E[%i%d;%dH:ct=\E[3g:do=^J:nd=\E[C:pt:rc=\E8:rs=\Ec:sc=\E7:st=\EH:up=\EM:le=^H:bl=^G:cr=^M:it#8:ho=\E[H:nw=\EE:ta=^I:is=\E)0:li#14:co#200:am:xn:xv:LP:sr=\EM:al=\E[L:AL=\E[%dL:cs=\E[%i%d;%dr:dl=\E[M:DL=\E[%dM:dc=\E[P:DC=\E[%dP:im=\E[4h:ei=\E[4l:mi:IC=\E[%d@:ks=\E[?1h\E=:ke=\E[?1l\E>:vi=\E[?25l:ve=\E[34h\E[?25h:vs=\E[34l:ti=\E[?1049h:te=\E[?1049l:us=\E[4m:ue=\E[24m:so=\E[3m:se=\E[23m:mb=\E[5m:md=\E[1m:mh=\E[2m:mr=\E[7m:me=\E[m:ms:Co#8:pa#64:AF=\E[3%dm:AB=\E[4%dm:op=\E[39;49m:AX:vb=\Eg:G0:as=\E(0:ae=\E(B:ac=\140\140aaffggjjkkllmmnnooppqqrrssttuuvvwwxxyyzz{{||}}~~..--++,,hhII00:po=\E[5i:pf=\E[4i:Km=\E[<:k0=\E[10~:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:k5=\E[15~:k6=\E[17~:k7=\E[18~:k8=\E[19~:k9=\E[20~:k;=\E[21~:F1=\E[23~:F2=\E[24~:kB=\E[Z:kh=\E[1~:@1=\E[1~:kH=\E[4~:@7=\E[4~:kN=\E[6~:kP=\E[5~:kI=\E[2~:kD=\E[3~:ku=\EOA:kd=\EOB:kr=\EOC:kl=\EOD:km:
+	TERM_PROGRAM=vscode
+	TERM_PROGRAM_VERSION=1.135.0
+	USER=eduardo
+	VIRTUAL_ENV=/home/eduardo/running-ng/running-env
+	VSCODE_GIT_ASKPASS_EXTRA_ARGS=
+	VSCODE_GIT_ASKPASS_MAIN=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/extensions/git/dist/askpass-main.js
+	VSCODE_GIT_ASKPASS_NODE=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/node
+	VSCODE_GIT_IPC_HANDLE=/run/user/1218/vscode-git-b79068f4db.sock
+	VSCODE_IPC_HOOK_CLI=/run/user/1218/vscode-ipc-8f0f799c-1b5b-4118-ac50-4ffca798b483.sock
+	VSCODE_PYTHON_AUTOACTIVATE_GUARD=1
+	WINDOW=0
+	XDG_RUNTIME_DIR=/run/user/1218
+	XDG_SESSION_CLASS=user
+	XDG_SESSION_ID=15956
+	XDG_SESSION_TYPE=tty
+	_=/home/eduardo/running-ng/running-env/bin/python3
+OS: Linux ermine 6.8.0-90-generic #91~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Nov 21 07:37:59 UTC 2 aarch64 aarch64 aarch64 GNU/Linux
+CPU: Neoverse-N1
+number of cores: 80
+Frequency of cpu 0: 3.00 GHz
+Governor of cpu 0: performance
+Scaling_min_freq of cpu 0: 1.00 GHz
+Frequency of cpu 1: 3.00 GHz
+Governor of cpu 1: performance
+Scaling_min_freq of cpu 1: 1.00 GHz
+Frequency of cpu 2: 3.00 GHz
+Governor of cpu 2: performance
+Scaling_min_freq of cpu 2: 1.00 GHz
+Frequency of cpu 3: 3.00 GHz
+Governor of cpu 3: performance
+Scaling_min_freq of cpu 3: 1.00 GHz
+Frequency of cpu 4: 3.00 GHz
+Governor of cpu 4: performance
+Scaling_min_freq of cpu 4: 1.00 GHz
+Frequency of cpu 5: 3.00 GHz
+Governor of cpu 5: performance
+Scaling_min_freq of cpu 5: 1.00 GHz
+Frequency of cpu 6: 3.00 GHz
+Governor of cpu 6: performance
+Scaling_min_freq of cpu 6: 1.00 GHz
+Frequency of cpu 7: 3.00 GHz
+Governor of cpu 7: performance
+Scaling_min_freq of cpu 7: 1.00 GHz
+Frequency of cpu 8: 3.00 GHz
+Governor of cpu 8: performance
+Scaling_min_freq of cpu 8: 1.00 GHz
+Frequency of cpu 9: 3.00 GHz
+Governor of cpu 9: performance
+Scaling_min_freq of cpu 9: 1.00 GHz
+Frequency of cpu 10: 3.00 GHz
+Governor of cpu 10: performance
+Scaling_min_freq of cpu 10: 1.00 GHz
+Frequency of cpu 11: 3.00 GHz
+Governor of cpu 11: performance
+Scaling_min_freq of cpu 11: 1.00 GHz
+Frequency of cpu 12: 3.00 GHz
+Governor of cpu 12: performance
+Scaling_min_freq of cpu 12: 1.00 GHz
+Frequency of cpu 13: 3.00 GHz
+Governor of cpu 13: performance
+Scaling_min_freq of cpu 13: 1.00 GHz
+Frequency of cpu 14: 3.00 GHz
+Governor of cpu 14: performance
+Scaling_min_freq of cpu 14: 1.00 GHz
+Frequency of cpu 15: 3.00 GHz
+Governor of cpu 15: performance
+Scaling_min_freq of cpu 15: 1.00 GHz
+Frequency of cpu 16: 3.00 GHz
+Governor of cpu 16: performance
+Scaling_min_freq of cpu 16: 1.00 GHz
+Frequency of cpu 17: 3.00 GHz
+Governor of cpu 17: performance
+Scaling_min_freq of cpu 17: 1.00 GHz
+Frequency of cpu 18: 3.00 GHz
+Governor of cpu 18: performance
+Scaling_min_freq of cpu 18: 1.00 GHz
+Frequency of cpu 19: 3.00 GHz
+Governor of cpu 19: performance
+Scaling_min_freq of cpu 19: 1.00 GHz
+Frequency of cpu 20: 3.00 GHz
+Governor of cpu 20: performance
+Scaling_min_freq of cpu 20: 1.00 GHz
+Frequency of cpu 21: 3.00 GHz
+Governor of cpu 21: performance
+Scaling_min_freq of cpu 21: 1.00 GHz
+Frequency of cpu 22: 3.00 GHz
+Governor of cpu 22: performance
+Scaling_min_freq of cpu 22: 1.00 GHz
+Frequency of cpu 23: 3.00 GHz
+Governor of cpu 23: performance
+Scaling_min_freq of cpu 23: 1.00 GHz
+Frequency of cpu 24: 3.00 GHz
+Governor of cpu 24: performance
+Scaling_min_freq of cpu 24: 1.00 GHz
+Frequency of cpu 25: 3.00 GHz
+Governor of cpu 25: performance
+Scaling_min_freq of cpu 25: 1.00 GHz
+Frequency of cpu 26: 3.00 GHz
+Governor of cpu 26: performance
+Scaling_min_freq of cpu 26: 1.00 GHz
+Frequency of cpu 27: 3.00 GHz
+Governor of cpu 27: performance
+Scaling_min_freq of cpu 27: 1.00 GHz
+Frequency of cpu 28: 3.00 GHz
+Governor of cpu 28: performance
+Scaling_min_freq of cpu 28: 1.00 GHz
+Frequency of cpu 29: 3.00 GHz
+Governor of cpu 29: performance
+Scaling_min_freq of cpu 29: 1.00 GHz
+Frequency of cpu 30: 3.00 GHz
+Governor of cpu 30: performance
+Scaling_min_freq of cpu 30: 1.00 GHz
+Frequency of cpu 31: 3.00 GHz
+Governor of cpu 31: performance
+Scaling_min_freq of cpu 31: 1.00 GHz
+Frequency of cpu 32: 3.00 GHz
+Governor of cpu 32: performance
+Scaling_min_freq of cpu 32: 1.00 GHz
+Frequency of cpu 33: 3.00 GHz
+Governor of cpu 33: performance
+Scaling_min_freq of cpu 33: 1.00 GHz
+Frequency of cpu 34: 3.00 GHz
+Governor of cpu 34: performance
+Scaling_min_freq of cpu 34: 1.00 GHz
+Frequency of cpu 35: 3.00 GHz
+Governor of cpu 35: performance
+Scaling_min_freq of cpu 35: 1.00 GHz
+Frequency of cpu 36: 3.00 GHz
+Governor of cpu 36: performance
+Scaling_min_freq of cpu 36: 1.00 GHz
+Frequency of cpu 37: 3.00 GHz
+Governor of cpu 37: performance
+Scaling_min_freq of cpu 37: 1.00 GHz
+Frequency of cpu 38: 3.00 GHz
+Governor of cpu 38: performance
+Scaling_min_freq of cpu 38: 1.00 GHz
+Frequency of cpu 39: 3.00 GHz
+Governor of cpu 39: performance
+Scaling_min_freq of cpu 39: 1.00 GHz
+Frequency of cpu 40: 3.00 GHz
+Governor of cpu 40: performance
+Scaling_min_freq of cpu 40: 1.00 GHz
+Frequency of cpu 41: 3.00 GHz
+Governor of cpu 41: performance
+Scaling_min_freq of cpu 41: 1.00 GHz
+Frequency of cpu 42: 3.00 GHz
+Governor of cpu 42: performance
+Scaling_min_freq of cpu 42: 1.00 GHz
+Frequency of cpu 43: 3.00 GHz
+Governor of cpu 43: performance
+Scaling_min_freq of cpu 43: 1.00 GHz
+Frequency of cpu 44: 3.00 GHz
+Governor of cpu 44: performance
+Scaling_min_freq of cpu 44: 1.00 GHz
+Frequency of cpu 45: 3.00 GHz
+Governor of cpu 45: performance
+Scaling_min_freq of cpu 45: 1.00 GHz
+Frequency of cpu 46: 3.00 GHz
+Governor of cpu 46: performance
+Scaling_min_freq of cpu 46: 1.00 GHz
+Frequency of cpu 47: 3.00 GHz
+Governor of cpu 47: performance
+Scaling_min_freq of cpu 47: 1.00 GHz
+Frequency of cpu 48: 3.00 GHz
+Governor of cpu 48: performance
+Scaling_min_freq of cpu 48: 1.00 GHz
+Frequency of cpu 49: 3.00 GHz
+Governor of cpu 49: performance
+Scaling_min_freq of cpu 49: 1.00 GHz
+Frequency of cpu 50: 3.00 GHz
+Governor of cpu 50: performance
+Scaling_min_freq of cpu 50: 1.00 GHz
+Frequency of cpu 51: 3.00 GHz
+Governor of cpu 51: performance
+Scaling_min_freq of cpu 51: 1.00 GHz
+Frequency of cpu 52: 3.00 GHz
+Governor of cpu 52: performance
+Scaling_min_freq of cpu 52: 1.00 GHz
+Frequency of cpu 53: 3.00 GHz
+Governor of cpu 53: performance
+Scaling_min_freq of cpu 53: 1.00 GHz
+Frequency of cpu 54: 3.00 GHz
+Governor of cpu 54: performance
+Scaling_min_freq of cpu 54: 1.00 GHz
+Frequency of cpu 55: 3.00 GHz
+Governor of cpu 55: performance
+Scaling_min_freq of cpu 55: 1.00 GHz
+Frequency of cpu 56: 3.00 GHz
+Governor of cpu 56: performance
+Scaling_min_freq of cpu 56: 1.00 GHz
+Frequency of cpu 57: 3.00 GHz
+Governor of cpu 57: performance
+Scaling_min_freq of cpu 57: 1.00 GHz
+Frequency of cpu 58: 3.00 GHz
+Governor of cpu 58: performance
+Scaling_min_freq of cpu 58: 1.00 GHz
+Frequency of cpu 59: 3.00 GHz
+Governor of cpu 59: performance
+Scaling_min_freq of cpu 59: 1.00 GHz
+Frequency of cpu 60: 3.00 GHz
+Governor of cpu 60: performance
+Scaling_min_freq of cpu 60: 1.00 GHz
+Frequency of cpu 61: 3.00 GHz
+Governor of cpu 61: performance
+Scaling_min_freq of cpu 61: 1.00 GHz
+Frequency of cpu 62: 3.00 GHz
+Governor of cpu 62: performance
+Scaling_min_freq of cpu 62: 1.00 GHz
+Frequency of cpu 63: 3.00 GHz
+Governor of cpu 63: performance
+Scaling_min_freq of cpu 63: 1.00 GHz
+Frequency of cpu 64: 3.00 GHz
+Governor of cpu 64: performance
+Scaling_min_freq of cpu 64: 1.00 GHz
+Frequency of cpu 65: 3.00 GHz
+Governor of cpu 65: performance
+Scaling_min_freq of cpu 65: 1.00 GHz
+Frequency of cpu 66: 3.00 GHz
+Governor of cpu 66: performance
+Scaling_min_freq of cpu 66: 1.00 GHz
+Frequency of cpu 67: 3.00 GHz
+Governor of cpu 67: performance
+Scaling_min_freq of cpu 67: 1.00 GHz
+Frequency of cpu 68: 3.00 GHz
+Governor of cpu 68: performance
+Scaling_min_freq of cpu 68: 1.00 GHz
+Frequency of cpu 69: 3.00 GHz
+Governor of cpu 69: performance
+Scaling_min_freq of cpu 69: 1.00 GHz
+Frequency of cpu 70: 3.00 GHz
+Governor of cpu 70: performance
+Scaling_min_freq of cpu 70: 1.00 GHz
+Frequency of cpu 71: 3.00 GHz
+Governor of cpu 71: performance
+Scaling_min_freq of cpu 71: 1.00 GHz
+Frequency of cpu 72: 3.00 GHz
+Governor of cpu 72: performance
+Scaling_min_freq of cpu 72: 1.00 GHz
+Frequency of cpu 73: 3.00 GHz
+Governor of cpu 73: performance
+Scaling_min_freq of cpu 73: 1.00 GHz
+Frequency of cpu 74: 3.00 GHz
+Governor of cpu 74: performance
+Scaling_min_freq of cpu 74: 1.00 GHz
+Frequency of cpu 75: 3.00 GHz
+Governor of cpu 75: performance
+Scaling_min_freq of cpu 75: 1.00 GHz
+Frequency of cpu 76: 3.00 GHz
+Governor of cpu 76: performance
+Scaling_min_freq of cpu 76: 1.00 GHz
+Frequency of cpu 77: 3.00 GHz
+Governor of cpu 77: performance
+Scaling_min_freq of cpu 77: 1.00 GHz
+Frequency of cpu 78: 3.00 GHz
+Governor of cpu 78: performance
+Scaling_min_freq of cpu 78: 1.00 GHz
+Frequency of cpu 79: 3.00 GHz
+Governor of cpu 79: performance
+Scaling_min_freq of cpu 79: 1.00 GHz
+[0;33m[Warning] --sets is deprecated, use --set instead.[0;0;00m
+[0;33m[Warning] --sets is deprecated, use --set instead.[0;0;00m
+[Error] Machine definition not available for selected architecture, defaulting to host
+[Info] unrolling loop at /home/eduardo/macro-benches/benchmarks/goblint/goblint_gen_large.c:9:3-859:3 with factor 4
+[Info] SV-COMP specification: CHECK( init(main()), LTL(G ! call(reach_error())) )
+
+[Info] runtime: 00:00:10.536
+[Info] vars: 6054, evals: 5487
+
+[Info] |called|=3405
+
+Memory statistics: total=28113.17MB, max=72.79MB, minor=28108.83MB, major=252.18MB, promoted=247.84MB
+    minor collections=13415  major collections=23 compactions=0
+
+
+[Info] runtime: 00:00:20.558
+[Info] vars: 6214, evals: 5567
+
+[Info] |called|=2082
+
+Memory statistics: total=56753.71MB, max=86.61MB, minor=56749.29MB, major=514.40MB, promoted=509.98MB
+    minor collections=27078  major collections=35 compactions=0
+
+
+[Info] runtime: 00:00:30.584
+[Info] vars: 6374, evals: 5647
+
+[Info] |called|=760
+
+Memory statistics: total=85371.13MB, max=102.38MB, minor=85366.69MB, major=776.77MB, promoted=772.34MB
+    minor collections=40729  major collections=45 compactions=0
+
+
+[Info] runtime: 00:00:40.606
+[Info] vars: 7862, evals: 8224
+
+[Info] |called|=240
+
+Memory statistics: total=112751.24MB, max=117.84MB, minor=112746.77MB, major=1045.32MB, promoted=1040.86MB
+    minor collections=53789  major collections=53 compactions=0
+
+
+[Info] runtime: 00:00:50.630
+[Info] vars: 7862, evals: 9473
+
+[Info] |called|=42
+
+Memory statistics: total=141701.05MB, max=137.24MB, minor=141696.57MB, major=1303.50MB, promoted=1299.02MB
+    minor collections=67597  major collections=60 compactions=0
+
+
+[Info] runtime: 00:01:00.638
+[Info] vars: 7862, evals: 11891
+
+[Info] |called|=1093
+
+Memory statistics: total=170691.73MB, max=143.70MB, minor=170687.27MB, major=1566.07MB, promoted=1561.61MB
+    minor collections=81424  major collections=66 compactions=0
+
+
+[Info] runtime: 00:01:10.646
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=198614.06MB, max=149.37MB, minor=198609.46MB, major=1822.22MB, promoted=1817.61MB
+    minor collections=94742  major collections=73 compactions=0
+
+
+[Info] runtime: 00:01:20.659
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=227366.76MB, max=155.36MB, minor=227362.12MB, major=2041.80MB, promoted=2037.16MB
+    minor collections=108455  major collections=78 compactions=0
+
+
+[Info] runtime: 00:01:30.661
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=255887.72MB, max=155.36MB, minor=255883.05MB, major=2295.10MB, promoted=2290.43MB
+    minor collections=122058  major collections=84 compactions=0
+
+
+[Info] runtime: 00:01:40.662
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=283318.12MB, max=155.36MB, minor=283313.47MB, major=2547.66MB, promoted=2543.01MB
+    minor collections=135141  major collections=90 compactions=0
+
+
+[Info] runtime: 00:01:50.670
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=312439.09MB, max=155.36MB, minor=312434.19MB, major=2798.58MB, promoted=2793.68MB
+    minor collections=149030  major collections=96 compactions=0
+
+*****
+{
+  "rusage": {
+    "user_time": 111.821,
+    "system_time": 0.266,
+    "minor_faults": 50344,
+    "major_faults": 1,
+    "voluntary_ctx_switches": 35,
+    "involuntary_ctx_switches": 321
+  },
+  "olly": {
+    "version": 1,
+    "wall_time": 112.05,
+    "cpu_time": 112.05,
+    "gc_time": 8.46,
+    "gc_overhead": 7.55,
+    "max_rss_kb": 188528,
+    "domain_stats": {
+      "0": {
+        "wall_time": 112.05,
+        "gc_time": 8.46,
+        "gc_overhead": 7.55
+      }
+    },
+    "mean_latency": 0.028073,
+    "stddev_latency": 0.066534,
+    "min_latency": 0.0,
+    "max_latency": 6.737919,
+    "distr_latency": {
+      "25.0000": 0.007567,
+      "50.0000": 0.013367,
+      "60.0000": 0.017215,
+      "70.0000": 0.023935,
+      "75.0000": 0.030895,
+      "80.0000": 0.049983,
+      "85.0000": 0.062175,
+      "90.0000": 0.068543,
+      "95.0000": 0.092991,
+      "96.0000": 0.099455,
+      "97.0000": 0.106687,
+      "98.0000": 0.115775,
+      "99.0000": 0.138111,
+      "99.9000": 0.491775,
+      "99.9900": 3.487743,
+      "99.9990": 5.136383,
+      "99.9999": 6.737919,
+      "100.0000": 6.737919
+    },
+    "allocations": {
+      "total_heap": 39511999656,
+      "minor_heap": 39511317185,
+      "major_heap": 352268632,
+      "promoted_words": 351586161,
+      "promoted_pct": 0.89
+    },
+    "domain_alloc_stats": {
+      "0": {
+        "total": 39511999656,
+        "minor": 39511317185,
+        "promoted": 351586161,
+        "major": 352268632,
+        "promoted_pct": 0.89
+      }
+    },
+    "collections": {
+      "minor": 150774,
+      "major": 97,
+      "forced_major": 0,
+      "compactions": 0
+    }
+  },
+  "counter_backend": "linux-perf",
+  "perf": [
+    {
+      "counter-value": "112068.710320",
+      "unit": "msec",
+      "event": "task-clock",
+      "event-runtime": 112068710320,
+      "pcnt-running": 100.0,
+      "metric-value": "0.999582",
+      "metric-unit": "CPUs utilized"
+    },
+    {
+      "counter-value": "49223.000000",
+      "unit": "",
+      "event": "page-faults",
+      "event-runtime": 112068710320,
+      "pcnt-running": 100.0,
+      "metric-value": "439.221616",
+      "metric-unit": "/sec"
+    },
+    {
+      "counter-value": "336199244915.000000",
+      "unit": "",
+      "event": "cycles",
+      "event-runtime": 112068710320,
+      "pcnt-running": 100.0,
+      "metric-value": "2.999939",
+      "metric-unit": "GHz"
+    },
+    {
+      "counter-value": "752737426299.000000",
+      "unit": "",
+      "event": "instructions",
+      "event-runtime": 112068710320,
+      "pcnt-running": 100.0,
+      "metric-value": "2.238962",
+      "metric-unit": "insn per cycle"
+    }
+  ]
+}
+-----
+mkdir -p PLOTTY_WORKAROUND; timedrun;  taskset -c 79 /home/eduardo/macro-benches/benchmarks/goblint/goblint_gen_large-ocaml-5.5.1
+running-ng v0.3.8
+Thu Sep 17 12:50:34 PM UTC 2026
+
+ 12:50:34 up 80 days,  5:57,  1 user,  load average: 1.00, 1.00, 1.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+hosking  pts/1    tmux(2549295).%0 Mon10    6:48m 39:13  39:13  claude
+
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 0  0      0 142493536 3117004 115139144    0    0     0     1    0    0  0  0 100  0  0
+ 0  0      0 142493536 3117004 115139144    0    0     0     0  344  227  0  0 100  0  0
+
+top - 12:50:35 up 80 days,  5:57,  1 user,  load average: 1.00, 1.00, 1.00
+Tasks: 908 total,   1 running, 907 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.1 us,  0.2 sy,  0.0 ni, 99.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem : 256773.5 total, 139153.8 free,   2135.5 used, 115484.3 buff/cache
+MiB Swap:   8192.0 total,   8192.0 free,      0.0 used. 251477.0 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+4157012 eduardo   20   0   10816   3840   2560 R  11.8   0.0   0:00.03 top -bcn 1 -w512
+      1 root      20   0  166428   8320   6400 S   0.0   0.0   2:26.80 /sbin/init linux
+      2 root      20   0       0      0      0 S   0.0   0.0   0:03.35 [kthreadd]
+      3 root      20   0       0      0      0 S   0.0   0.0   0:00.00 [pool_workqueue_release]
+      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 [kworker/R-rcu_g]
+
+Environment variables: 
+	BROWSER=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/bin/helpers/browser.sh
+	CLAUDE_CODE_SSE_PORT=48465
+	COLORTERM=truecolor
+	CONFIG_FILE=src/running/config/experiments/macro_5.5.1_align.yml
+	COPILOT_DEBUG_NONCE=50404694a3550ea125961c3610f82ed8
+	DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1218/bus
+	GIT_ASKPASS=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/extensions/git/dist/askpass.sh
+	HOME=/home/eduardo
+	LANG=en_US.UTF-8
+	LOGNAME=eduardo
+	LOG_DIR=/home/eduardo/running-ng/gc-sweep-logs-5.5.1-align-ermine-2026-09-17
+	MOTD_SHOWN=pam
+	OLDPWD=/home/eduardo/running-ng
+	OLLY_DIR=/home/eduardo/runtime_events_tools
+	PATH=/home/eduardo/.local/bin:/home/eduardo/runtime_events_tools/_build/install/default/bin:/home/eduardo/.opam/running-ng-tools/bin:/home/eduardo/.local/bin:/home/eduardo/running-ng/running-env/bin:/home/eduardo/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand:/home/eduardo/.vscode-server/data/User/globalStorage/github.copilot-chat/copilotCli:/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+	PWD=/home/eduardo/running-ng
+	PYTHONPATH=/home/eduardo/running-ng/src
+	RUNNING_BENCH_DIR=/home/eduardo/macro-benches
+	RUNNING_MACRO_BENCH_DIR=/home/eduardo/macro-benches
+	RUNNING_NG_PACKAGE_DATA=/home/eduardo/running-ng/src/running/config
+	RUNNING_REUSE_SWITCHES=1
+	RUNNING_TAG=align_stress
+	SHELL=/bin/bash
+	SHLVL=4
+	SSH_CLIENT=10.0.0.2 33248 22
+	SSH_CONNECTION=10.0.0.2 33248 10.0.0.6 22
+	SSH_ORIGINAL_COMMAND=bash
+	STY=3885520.fp-benches
+	TERM=screen.xterm-256color
+	TERMCAP=SC|screen.xterm-256color|VT 100/ANSI X3.64 virtual terminal:DO=\E[%dB:LE=\E[%dD:RI=\E[%dC:UP=\E[%dA:bs:bt=\E[Z:cd=\E[J:ce=\E[K:cl=\E[H\E[J:cm=\E[%i%d;%dH:ct=\E[3g:do=^J:nd=\E[C:pt:rc=\E8:rs=\Ec:sc=\E7:st=\EH:up=\EM:le=^H:bl=^G:cr=^M:it#8:ho=\E[H:nw=\EE:ta=^I:is=\E)0:li#14:co#200:am:xn:xv:LP:sr=\EM:al=\E[L:AL=\E[%dL:cs=\E[%i%d;%dr:dl=\E[M:DL=\E[%dM:dc=\E[P:DC=\E[%dP:im=\E[4h:ei=\E[4l:mi:IC=\E[%d@:ks=\E[?1h\E=:ke=\E[?1l\E>:vi=\E[?25l:ve=\E[34h\E[?25h:vs=\E[34l:ti=\E[?1049h:te=\E[?1049l:us=\E[4m:ue=\E[24m:so=\E[3m:se=\E[23m:mb=\E[5m:md=\E[1m:mh=\E[2m:mr=\E[7m:me=\E[m:ms:Co#8:pa#64:AF=\E[3%dm:AB=\E[4%dm:op=\E[39;49m:AX:vb=\Eg:G0:as=\E(0:ae=\E(B:ac=\140\140aaffggjjkkllmmnnooppqqrrssttuuvvwwxxyyzz{{||}}~~..--++,,hhII00:po=\E[5i:pf=\E[4i:Km=\E[<:k0=\E[10~:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:k5=\E[15~:k6=\E[17~:k7=\E[18~:k8=\E[19~:k9=\E[20~:k;=\E[21~:F1=\E[23~:F2=\E[24~:kB=\E[Z:kh=\E[1~:@1=\E[1~:kH=\E[4~:@7=\E[4~:kN=\E[6~:kP=\E[5~:kI=\E[2~:kD=\E[3~:ku=\EOA:kd=\EOB:kr=\EOC:kl=\EOD:km:
+	TERM_PROGRAM=vscode
+	TERM_PROGRAM_VERSION=1.135.0
+	USER=eduardo
+	VIRTUAL_ENV=/home/eduardo/running-ng/running-env
+	VSCODE_GIT_ASKPASS_EXTRA_ARGS=
+	VSCODE_GIT_ASKPASS_MAIN=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/extensions/git/dist/askpass-main.js
+	VSCODE_GIT_ASKPASS_NODE=/home/eduardo/.vscode-server/cli/servers/Stable-08d4889f9ec4a1685d257b9b95de036c8e1ce1e5/server/node
+	VSCODE_GIT_IPC_HANDLE=/run/user/1218/vscode-git-b79068f4db.sock
+	VSCODE_IPC_HOOK_CLI=/run/user/1218/vscode-ipc-8f0f799c-1b5b-4118-ac50-4ffca798b483.sock
+	VSCODE_PYTHON_AUTOACTIVATE_GUARD=1
+	WINDOW=0
+	XDG_RUNTIME_DIR=/run/user/1218
+	XDG_SESSION_CLASS=user
+	XDG_SESSION_ID=15956
+	XDG_SESSION_TYPE=tty
+	_=/home/eduardo/running-ng/running-env/bin/python3
+OS: Linux ermine 6.8.0-90-generic #91~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Nov 21 07:37:59 UTC 2 aarch64 aarch64 aarch64 GNU/Linux
+CPU: Neoverse-N1
+number of cores: 80
+Frequency of cpu 0: 3.00 GHz
+Governor of cpu 0: performance
+Scaling_min_freq of cpu 0: 1.00 GHz
+Frequency of cpu 1: 3.00 GHz
+Governor of cpu 1: performance
+Scaling_min_freq of cpu 1: 1.00 GHz
+Frequency of cpu 2: 3.00 GHz
+Governor of cpu 2: performance
+Scaling_min_freq of cpu 2: 1.00 GHz
+Frequency of cpu 3: 3.00 GHz
+Governor of cpu 3: performance
+Scaling_min_freq of cpu 3: 1.00 GHz
+Frequency of cpu 4: 3.00 GHz
+Governor of cpu 4: performance
+Scaling_min_freq of cpu 4: 1.00 GHz
+Frequency of cpu 5: 3.00 GHz
+Governor of cpu 5: performance
+Scaling_min_freq of cpu 5: 1.00 GHz
+Frequency of cpu 6: 3.00 GHz
+Governor of cpu 6: performance
+Scaling_min_freq of cpu 6: 1.00 GHz
+Frequency of cpu 7: 3.00 GHz
+Governor of cpu 7: performance
+Scaling_min_freq of cpu 7: 1.00 GHz
+Frequency of cpu 8: 3.00 GHz
+Governor of cpu 8: performance
+Scaling_min_freq of cpu 8: 1.00 GHz
+Frequency of cpu 9: 3.00 GHz
+Governor of cpu 9: performance
+Scaling_min_freq of cpu 9: 1.00 GHz
+Frequency of cpu 10: 3.00 GHz
+Governor of cpu 10: performance
+Scaling_min_freq of cpu 10: 1.00 GHz
+Frequency of cpu 11: 3.00 GHz
+Governor of cpu 11: performance
+Scaling_min_freq of cpu 11: 1.00 GHz
+Frequency of cpu 12: 3.00 GHz
+Governor of cpu 12: performance
+Scaling_min_freq of cpu 12: 1.00 GHz
+Frequency of cpu 13: 3.00 GHz
+Governor of cpu 13: performance
+Scaling_min_freq of cpu 13: 1.00 GHz
+Frequency of cpu 14: 3.00 GHz
+Governor of cpu 14: performance
+Scaling_min_freq of cpu 14: 1.00 GHz
+Frequency of cpu 15: 3.00 GHz
+Governor of cpu 15: performance
+Scaling_min_freq of cpu 15: 1.00 GHz
+Frequency of cpu 16: 3.00 GHz
+Governor of cpu 16: performance
+Scaling_min_freq of cpu 16: 1.00 GHz
+Frequency of cpu 17: 3.00 GHz
+Governor of cpu 17: performance
+Scaling_min_freq of cpu 17: 1.00 GHz
+Frequency of cpu 18: 3.00 GHz
+Governor of cpu 18: performance
+Scaling_min_freq of cpu 18: 1.00 GHz
+Frequency of cpu 19: 3.00 GHz
+Governor of cpu 19: performance
+Scaling_min_freq of cpu 19: 1.00 GHz
+Frequency of cpu 20: 3.00 GHz
+Governor of cpu 20: performance
+Scaling_min_freq of cpu 20: 1.00 GHz
+Frequency of cpu 21: 3.00 GHz
+Governor of cpu 21: performance
+Scaling_min_freq of cpu 21: 1.00 GHz
+Frequency of cpu 22: 3.00 GHz
+Governor of cpu 22: performance
+Scaling_min_freq of cpu 22: 1.00 GHz
+Frequency of cpu 23: 3.00 GHz
+Governor of cpu 23: performance
+Scaling_min_freq of cpu 23: 1.00 GHz
+Frequency of cpu 24: 3.00 GHz
+Governor of cpu 24: performance
+Scaling_min_freq of cpu 24: 1.00 GHz
+Frequency of cpu 25: 3.00 GHz
+Governor of cpu 25: performance
+Scaling_min_freq of cpu 25: 1.00 GHz
+Frequency of cpu 26: 3.00 GHz
+Governor of cpu 26: performance
+Scaling_min_freq of cpu 26: 1.00 GHz
+Frequency of cpu 27: 3.00 GHz
+Governor of cpu 27: performance
+Scaling_min_freq of cpu 27: 1.00 GHz
+Frequency of cpu 28: 3.00 GHz
+Governor of cpu 28: performance
+Scaling_min_freq of cpu 28: 1.00 GHz
+Frequency of cpu 29: 3.00 GHz
+Governor of cpu 29: performance
+Scaling_min_freq of cpu 29: 1.00 GHz
+Frequency of cpu 30: 3.00 GHz
+Governor of cpu 30: performance
+Scaling_min_freq of cpu 30: 1.00 GHz
+Frequency of cpu 31: 3.00 GHz
+Governor of cpu 31: performance
+Scaling_min_freq of cpu 31: 1.00 GHz
+Frequency of cpu 32: 3.00 GHz
+Governor of cpu 32: performance
+Scaling_min_freq of cpu 32: 1.00 GHz
+Frequency of cpu 33: 3.00 GHz
+Governor of cpu 33: performance
+Scaling_min_freq of cpu 33: 1.00 GHz
+Frequency of cpu 34: 3.00 GHz
+Governor of cpu 34: performance
+Scaling_min_freq of cpu 34: 1.00 GHz
+Frequency of cpu 35: 3.00 GHz
+Governor of cpu 35: performance
+Scaling_min_freq of cpu 35: 1.00 GHz
+Frequency of cpu 36: 3.00 GHz
+Governor of cpu 36: performance
+Scaling_min_freq of cpu 36: 1.00 GHz
+Frequency of cpu 37: 3.00 GHz
+Governor of cpu 37: performance
+Scaling_min_freq of cpu 37: 1.00 GHz
+Frequency of cpu 38: 3.00 GHz
+Governor of cpu 38: performance
+Scaling_min_freq of cpu 38: 1.00 GHz
+Frequency of cpu 39: 3.00 GHz
+Governor of cpu 39: performance
+Scaling_min_freq of cpu 39: 1.00 GHz
+Frequency of cpu 40: 3.00 GHz
+Governor of cpu 40: performance
+Scaling_min_freq of cpu 40: 1.00 GHz
+Frequency of cpu 41: 3.00 GHz
+Governor of cpu 41: performance
+Scaling_min_freq of cpu 41: 1.00 GHz
+Frequency of cpu 42: 3.00 GHz
+Governor of cpu 42: performance
+Scaling_min_freq of cpu 42: 1.00 GHz
+Frequency of cpu 43: 3.00 GHz
+Governor of cpu 43: performance
+Scaling_min_freq of cpu 43: 1.00 GHz
+Frequency of cpu 44: 3.00 GHz
+Governor of cpu 44: performance
+Scaling_min_freq of cpu 44: 1.00 GHz
+Frequency of cpu 45: 3.00 GHz
+Governor of cpu 45: performance
+Scaling_min_freq of cpu 45: 1.00 GHz
+Frequency of cpu 46: 3.00 GHz
+Governor of cpu 46: performance
+Scaling_min_freq of cpu 46: 1.00 GHz
+Frequency of cpu 47: 3.00 GHz
+Governor of cpu 47: performance
+Scaling_min_freq of cpu 47: 1.00 GHz
+Frequency of cpu 48: 3.00 GHz
+Governor of cpu 48: performance
+Scaling_min_freq of cpu 48: 1.00 GHz
+Frequency of cpu 49: 3.00 GHz
+Governor of cpu 49: performance
+Scaling_min_freq of cpu 49: 1.00 GHz
+Frequency of cpu 50: 3.00 GHz
+Governor of cpu 50: performance
+Scaling_min_freq of cpu 50: 1.00 GHz
+Frequency of cpu 51: 3.00 GHz
+Governor of cpu 51: performance
+Scaling_min_freq of cpu 51: 1.00 GHz
+Frequency of cpu 52: 3.00 GHz
+Governor of cpu 52: performance
+Scaling_min_freq of cpu 52: 1.00 GHz
+Frequency of cpu 53: 3.00 GHz
+Governor of cpu 53: performance
+Scaling_min_freq of cpu 53: 1.00 GHz
+Frequency of cpu 54: 3.00 GHz
+Governor of cpu 54: performance
+Scaling_min_freq of cpu 54: 1.00 GHz
+Frequency of cpu 55: 3.00 GHz
+Governor of cpu 55: performance
+Scaling_min_freq of cpu 55: 1.00 GHz
+Frequency of cpu 56: 3.00 GHz
+Governor of cpu 56: performance
+Scaling_min_freq of cpu 56: 1.00 GHz
+Frequency of cpu 57: 3.00 GHz
+Governor of cpu 57: performance
+Scaling_min_freq of cpu 57: 1.00 GHz
+Frequency of cpu 58: 3.00 GHz
+Governor of cpu 58: performance
+Scaling_min_freq of cpu 58: 1.00 GHz
+Frequency of cpu 59: 3.00 GHz
+Governor of cpu 59: performance
+Scaling_min_freq of cpu 59: 1.00 GHz
+Frequency of cpu 60: 3.00 GHz
+Governor of cpu 60: performance
+Scaling_min_freq of cpu 60: 1.00 GHz
+Frequency of cpu 61: 3.00 GHz
+Governor of cpu 61: performance
+Scaling_min_freq of cpu 61: 1.00 GHz
+Frequency of cpu 62: 3.00 GHz
+Governor of cpu 62: performance
+Scaling_min_freq of cpu 62: 1.00 GHz
+Frequency of cpu 63: 3.00 GHz
+Governor of cpu 63: performance
+Scaling_min_freq of cpu 63: 1.00 GHz
+Frequency of cpu 64: 3.00 GHz
+Governor of cpu 64: performance
+Scaling_min_freq of cpu 64: 1.00 GHz
+Frequency of cpu 65: 3.00 GHz
+Governor of cpu 65: performance
+Scaling_min_freq of cpu 65: 1.00 GHz
+Frequency of cpu 66: 3.00 GHz
+Governor of cpu 66: performance
+Scaling_min_freq of cpu 66: 1.00 GHz
+Frequency of cpu 67: 3.00 GHz
+Governor of cpu 67: performance
+Scaling_min_freq of cpu 67: 1.00 GHz
+Frequency of cpu 68: 3.00 GHz
+Governor of cpu 68: performance
+Scaling_min_freq of cpu 68: 1.00 GHz
+Frequency of cpu 69: 3.00 GHz
+Governor of cpu 69: performance
+Scaling_min_freq of cpu 69: 1.00 GHz
+Frequency of cpu 70: 3.00 GHz
+Governor of cpu 70: performance
+Scaling_min_freq of cpu 70: 1.00 GHz
+Frequency of cpu 71: 3.00 GHz
+Governor of cpu 71: performance
+Scaling_min_freq of cpu 71: 1.00 GHz
+Frequency of cpu 72: 3.00 GHz
+Governor of cpu 72: performance
+Scaling_min_freq of cpu 72: 1.00 GHz
+Frequency of cpu 73: 3.00 GHz
+Governor of cpu 73: performance
+Scaling_min_freq of cpu 73: 1.00 GHz
+Frequency of cpu 74: 3.00 GHz
+Governor of cpu 74: performance
+Scaling_min_freq of cpu 74: 1.00 GHz
+Frequency of cpu 75: 3.00 GHz
+Governor of cpu 75: performance
+Scaling_min_freq of cpu 75: 1.00 GHz
+Frequency of cpu 76: 3.00 GHz
+Governor of cpu 76: performance
+Scaling_min_freq of cpu 76: 1.00 GHz
+Frequency of cpu 77: 3.00 GHz
+Governor of cpu 77: performance
+Scaling_min_freq of cpu 77: 1.00 GHz
+Frequency of cpu 78: 3.00 GHz
+Governor of cpu 78: performance
+Scaling_min_freq of cpu 78: 1.00 GHz
+Frequency of cpu 79: 3.00 GHz
+Governor of cpu 79: performance
+Scaling_min_freq of cpu 79: 1.00 GHz
+[0;33m[Warning] --sets is deprecated, use --set instead.[0;0;00m
+[0;33m[Warning] --sets is deprecated, use --set instead.[0;0;00m
+[Error] Machine definition not available for selected architecture, defaulting to host
+[Info] unrolling loop at /home/eduardo/macro-benches/benchmarks/goblint/goblint_gen_large.c:9:3-859:3 with factor 4
+[Info] SV-COMP specification: CHECK( init(main()), LTL(G ! call(reach_error())) )
+
+[Info] runtime: 00:00:10.535
+[Info] vars: 6054, evals: 5487
+
+[Info] |called|=3406
+
+Memory statistics: total=28079.59MB, max=72.75MB, minor=28075.27MB, major=251.88MB, promoted=247.57MB
+    minor collections=13399  major collections=23 compactions=0
+
+
+[Info] runtime: 00:00:20.555
+[Info] vars: 6214, evals: 5567
+
+[Info] |called|=2086
+
+Memory statistics: total=56629.97MB, max=86.71MB, minor=56625.56MB, major=513.26MB, promoted=508.85MB
+    minor collections=27019  major collections=35 compactions=0
+
+
+[Info] runtime: 00:00:30.582
+[Info] vars: 6374, evals: 5647
+
+[Info] |called|=765
+
+Memory statistics: total=85194.97MB, max=102.54MB, minor=85190.53MB, major=775.14MB, promoted=770.71MB
+    minor collections=40645  major collections=45 compactions=0
+
+
+[Info] runtime: 00:00:40.610
+[Info] vars: 7851, evals: 8212
+
+[Info] |called|=315
+
+Memory statistics: total=112637.99MB, max=118.04MB, minor=112633.53MB, major=1043.60MB, promoted=1039.14MB
+    minor collections=53735  major collections=53 compactions=0
+
+
+[Info] runtime: 00:00:50.644
+[Info] vars: 7862, evals: 9473
+
+[Info] |called|=47
+
+Memory statistics: total=141403.27MB, max=137.11MB, minor=141398.79MB, major=1301.34MB, promoted=1296.86MB
+    minor collections=67455  major collections=60 compactions=0
+
+
+[Info] runtime: 00:01:00.661
+[Info] vars: 7862, evals: 11891
+
+[Info] |called|=1101
+
+Memory statistics: total=170423.33MB, max=143.50MB, minor=170418.84MB, major=1563.60MB, promoted=1559.11MB
+    minor collections=81296  major collections=66 compactions=0
+
+
+[Info] runtime: 00:01:10.669
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=198284.85MB, max=148.85MB, minor=198280.21MB, major=1820.77MB, promoted=1816.13MB
+    minor collections=94585  major collections=73 compactions=0
+
+
+[Info] runtime: 00:01:20.686
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=227016.55MB, max=155.43MB, minor=227011.90MB, major=2038.29MB, promoted=2033.65MB
+    minor collections=108288  major collections=78 compactions=0
+
+
+[Info] runtime: 00:01:30.688
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=255485.05MB, max=155.43MB, minor=255480.40MB, major=2291.24MB, promoted=2286.59MB
+    minor collections=121866  major collections=84 compactions=0
+
+
+[Info] runtime: 00:01:40.691
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=282823.22MB, max=155.43MB, minor=282818.55MB, major=2544.36MB, promoted=2539.68MB
+    minor collections=134905  major collections=90 compactions=0
+
+
+[Info] runtime: 00:01:50.692
+[Info] vars: 7863, evals: 11971
+
+[Info] |called|=0
+
+Memory statistics: total=312046.76MB, max=155.43MB, minor=312042.03MB, major=2793.71MB, promoted=2788.98MB
+    minor collections=148843  major collections=96 compactions=0
+
+*****
+{
+  "rusage": {
+    "user_time": 112.0,
+    "system_time": 0.289,
+    "minor_faults": 50297,
+    "major_faults": 1,
+    "voluntary_ctx_switches": 35,
+    "involuntary_ctx_switches": 349
+  },
+  "olly": {
+    "version": 1,
+    "wall_time": 112.25,
+    "cpu_time": 112.25,
+    "gc_time": 8.42,
+    "gc_overhead": 7.51,
+    "max_rss_kb": 188524,
+    "domain_stats": {
+      "0": {
+        "wall_time": 112.25,
+        "gc_time": 8.42,
+        "gc_overhead": 7.51
+      }
+    },
+    "mean_latency": 0.02795,
+    "stddev_latency": 0.065656,
+    "min_latency": 0.0,
+    "max_latency": 6.373375,
+    "distr_latency": {
+      "25.0000": 0.007607,
+      "50.0000": 0.013327,
+      "60.0000": 0.017167,
+      "70.0000": 0.023887,
+      "75.0000": 0.030687,
+      "80.0000": 0.049791,
+      "85.0000": 0.061503,
+      "90.0000": 0.067711,
+      "95.0000": 0.092799,
+      "96.0000": 0.099327,
+      "97.0000": 0.106623,
+      "98.0000": 0.115583,
+      "99.0000": 0.137727,
+      "99.9000": 0.495615,
+      "99.9900": 3.416063,
+      "99.9990": 5.181439,
+      "99.9999": 6.373375,
+      "100.0000": 6.373375
+    },
+    "allocations": {
+      "total_heap": 39512000820,
+      "minor_heap": 39511318349,
+      "major_heap": 352270023,
+      "promoted_words": 351587552,
+      "promoted_pct": 0.89
+    },
+    "domain_alloc_stats": {
+      "0": {
+        "total": 39512000820,
+        "minor": 39511318349,
+        "promoted": 351587552,
+        "major": 352270023,
+        "promoted_pct": 0.89
+      }
+    },
+    "collections": {
+      "minor": 150774,
+      "major": 97,
+      "forced_major": 0,
+      "compactions": 0
+    }
+  },
+  "counter_backend": "linux-perf",
+  "perf": [
+    {
+      "counter-value": "112271.046720",
+      "unit": "msec",
+      "event": "task-clock",
+      "event-runtime": 112271046720,
+      "pcnt-running": 100.0,
+      "metric-value": "0.992539",
+      "metric-unit": "CPUs utilized"
+    },
+    {
+      "counter-value": "49176.000000",
+      "unit": "",
+      "event": "page-faults",
+      "event-runtime": 112271046720,
+      "pcnt-running": 100.0,
+      "metric-value": "438.011415",
+      "metric-unit": "/sec"
+    },
+    {
+      "counter-value": "336805868347.000000",
+      "unit": "",
+      "event": "cycles",
+      "event-runtime": 112271046720,
+      "pcnt-running": 100.0,
+      "metric-value": "2.999935",
+      "metric-unit": "GHz"
+    },
+    {
+      "counter-value": "752732033648.000000",
+      "unit": "",
+      "event": "instructions",
+      "event-runtime": 112271046720,
+      "pcnt-running": 100.0,
+      "metric-value": "2.234914",
+      "metric-unit": "insn per cycle"
+    }
+  ]
+}

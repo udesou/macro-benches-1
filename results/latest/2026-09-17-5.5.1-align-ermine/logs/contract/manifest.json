@@ -1,0 +1,315 @@
+{
+  "schema_version": "1.0",
+  "run_id": "ermine-2026-09-17-Thu-023128",
+  "created_at": "2026-09-17T19:37:47Z",
+  "machine": {
+    "hostname": "ermine",
+    "kernel": "6.8.0-90-generic",
+    "cores": 80,
+    "cpu_model": "Neoverse-N1",
+    "cpu_isolation": "topology",
+    "physical_cores": 80,
+    "threads_per_core": 1,
+    "numa_nodes": 1,
+    "sockets": 1
+  },
+  "configs": [
+    {
+      "config_id": "cfg_19a920ed9b5dd66aaf3a5a96caaa05f7",
+      "runtime": {
+        "kind": "OCaml",
+        "version": "5.5.1"
+      },
+      "tools": [
+        "olly",
+        "perf"
+      ],
+      "_runtime_name": "ocaml-5.5.1",
+      "_modifiers": [
+        "perf_grp1"
+      ]
+    },
+    {
+      "config_id": "cfg_0bc836e0f5b2525e9350425776b9b78f",
+      "runtime": {
+        "kind": "OCaml",
+        "version": "5.5.1",
+        "options": [
+          "--enable-frame-pointers"
+        ]
+      },
+      "tools": [
+        "olly",
+        "perf"
+      ],
+      "_runtime_name": "ocaml-5.5.1-fp",
+      "_modifiers": [
+        "perf_grp1"
+      ]
+    },
+    {
+      "config_id": "cfg_d095e9c644dfe10c80976d6ccaa60ae5",
+      "runtime": {
+        "kind": "OCaml",
+        "version": "5.5.1",
+        "options": [
+          "CFLAGS=-falign-loops=16:8"
+        ]
+      },
+      "tools": [
+        "olly",
+        "perf"
+      ],
+      "_runtime_name": "ocaml-5.5.1-alignL",
+      "_modifiers": [
+        "perf_grp1"
+      ]
+    },
+    {
+      "config_id": "cfg_bbbdddf9134ce42694d9e9234bef6a99",
+      "runtime": {
+        "kind": "OCaml",
+        "version": "5.5.1",
+        "options": [
+          "CFLAGS=-falign-functions=32"
+        ]
+      },
+      "tools": [
+        "olly",
+        "perf"
+      ],
+      "_runtime_name": "ocaml-5.5.1-alignF",
+      "_modifiers": [
+        "perf_grp1"
+      ]
+    },
+    {
+      "config_id": "cfg_875445d520b07bd8db97d0b12348754f",
+      "runtime": {
+        "kind": "OCaml",
+        "version": "5.5.1",
+        "options": [
+          "CFLAGS='-falign-functions=32 -falign-loops=16:8'"
+        ]
+      },
+      "tools": [
+        "olly",
+        "perf"
+      ],
+      "_runtime_name": "ocaml-5.5.1-alignLF",
+      "_modifiers": [
+        "perf_grp1"
+      ]
+    },
+    {
+      "config_id": "cfg_da08a08488fad19d77f4996983796699",
+      "runtime": {
+        "kind": "OCaml",
+        "version": "5.5.1",
+        "options": [
+          "--enable-frame-pointers",
+          "CFLAGS=-falign-loops=16:8"
+        ]
+      },
+      "tools": [
+        "olly",
+        "perf"
+      ],
+      "_runtime_name": "ocaml-5.5.1-fp-alignL",
+      "_modifiers": [
+        "perf_grp1"
+      ]
+    },
+    {
+      "config_id": "cfg_493bc91d39c7c4ae36c57d94ed0723a4",
+      "runtime": {
+        "kind": "OCaml",
+        "version": "5.5.1",
+        "options": [
+          "--enable-frame-pointers",
+          "CFLAGS=-falign-functions=32"
+        ]
+      },
+      "tools": [
+        "olly",
+        "perf"
+      ],
+      "_runtime_name": "ocaml-5.5.1-fp-alignF",
+      "_modifiers": [
+        "perf_grp1"
+      ]
+    },
+    {
+      "config_id": "cfg_32c93466b7bfb4ce033d1b18a62003a6",
+      "runtime": {
+        "kind": "OCaml",
+        "version": "5.5.1",
+        "options": [
+          "--enable-frame-pointers",
+          "CFLAGS='-falign-functions=32 -falign-loops=16:8'"
+        ]
+      },
+      "tools": [
+        "olly",
+        "perf"
+      ],
+      "_runtime_name": "ocaml-5.5.1-fp-alignLF",
+      "_modifiers": [
+        "perf_grp1"
+      ]
+    }
+  ],
+  "tool_versions": {
+    "perf": "6.8.12",
+    "olly": "0.5.4-12-g3d37a0b"
+  },
+  "comparisons": [
+    {
+      "kind": "inter",
+      "over": "runtime",
+      "mode": "pairwise",
+      "baseline": {
+        "runtime.version": "5.5.1",
+        "runtime.options": []
+      },
+      "variants": [
+        {
+          "runtime.version": "5.5.1",
+          "runtime.options": [
+            "--enable-frame-pointers"
+          ]
+        },
+        {
+          "runtime.version": "5.5.1",
+          "runtime.options": [
+            "--enable-frame-pointers",
+            "CFLAGS=-falign-loops=16:8"
+          ]
+        },
+        {
+          "runtime.version": "5.5.1",
+          "runtime.options": [
+            "--enable-frame-pointers",
+            "CFLAGS=-falign-functions=32"
+          ]
+        },
+        {
+          "runtime.version": "5.5.1",
+          "runtime.options": [
+            "--enable-frame-pointers",
+            "CFLAGS='-falign-functions=32 -falign-loops=16:8'"
+          ]
+        }
+      ],
+      "label": "5.5.1: fp, and fp+alignment, vs stock"
+    },
+    {
+      "kind": "inter",
+      "over": "runtime",
+      "mode": "pairwise",
+      "baseline": {
+        "runtime.version": "5.5.1",
+        "runtime.options": []
+      },
+      "variants": [
+        {
+          "runtime.version": "5.5.1",
+          "runtime.options": [
+            "CFLAGS=-falign-loops=16:8"
+          ]
+        },
+        {
+          "runtime.version": "5.5.1",
+          "runtime.options": [
+            "CFLAGS=-falign-functions=32"
+          ]
+        },
+        {
+          "runtime.version": "5.5.1",
+          "runtime.options": [
+            "CFLAGS='-falign-functions=32 -falign-loops=16:8'"
+          ]
+        }
+      ],
+      "label": "5.5.1: alignment vs stock (no fp)"
+    },
+    {
+      "kind": "inter",
+      "over": "runtime",
+      "mode": "pairwise",
+      "baseline": {
+        "runtime.version": "5.5.1",
+        "runtime.options": [
+          "--enable-frame-pointers"
+        ]
+      },
+      "variants": [
+        {
+          "runtime.version": "5.5.1",
+          "runtime.options": [
+            "--enable-frame-pointers",
+            "CFLAGS=-falign-loops=16:8"
+          ]
+        },
+        {
+          "runtime.version": "5.5.1",
+          "runtime.options": [
+            "--enable-frame-pointers",
+            "CFLAGS=-falign-functions=32"
+          ]
+        },
+        {
+          "runtime.version": "5.5.1",
+          "runtime.options": [
+            "--enable-frame-pointers",
+            "CFLAGS='-falign-functions=32 -falign-loops=16:8'"
+          ]
+        }
+      ],
+      "label": "5.5.1: alignment vs fp"
+    }
+  ],
+  "benchmarks": [
+    {
+      "name": "menhir_sysver_canonical",
+      "suite": "macro-menhir-monorepo"
+    },
+    {
+      "name": "alt_ergo_chain_default",
+      "suite": "macro-alt-ergo-monorepo"
+    },
+    {
+      "name": "alt_ergo_chain_large",
+      "suite": "macro-alt-ergo-monorepo"
+    },
+    {
+      "name": "frama_c_eva_sqlite_large",
+      "suite": "macro-frama-c-monorepo"
+    },
+    {
+      "name": "goblint_gen_default",
+      "suite": "macro-goblint-monorepo"
+    },
+    {
+      "name": "goblint_gen_large",
+      "suite": "macro-goblint-monorepo"
+    },
+    {
+      "name": "devkit_htmlstream_default",
+      "suite": "macro-devkit"
+    },
+    {
+      "name": "sedlex_tokenize_large",
+      "suite": "macro-sedlex"
+    },
+    {
+      "name": "liq_video_frames_pool_default",
+      "suite": "macro-liq-video-frames"
+    },
+    {
+      "name": "liq_video_frames_pool_large",
+      "suite": "macro-liq-video-frames"
+    }
+  ],
+  "_produced_by": "running-ng (native)"
+}
